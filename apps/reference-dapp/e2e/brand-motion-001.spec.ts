@@ -94,7 +94,7 @@ for (const width of widths) {
       return element.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2));
     });
     expect(reachable).toBe(true);
-    await expect(cta).toHaveAttribute('href', '/app');
+    await expect(cta).toHaveAttribute('href', '/login');
     await expect(page.getByRole('button', { name: 'Authorize workflow', exact: true })).toHaveCount(0);
     await expect(page.locator('[data-story-phase="Review"]')).toContainText('Your explicit approval');
     await expect(page.locator('[data-story-phase="Execute"]')).toContainText('Your wallet signature');

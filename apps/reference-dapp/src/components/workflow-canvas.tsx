@@ -31,6 +31,7 @@ import { shellChainLabel } from '../domain/product-shell';
 import { WorkflowName } from './workflow-name';
 import { DarkSpotlight } from './dark-spotlight';
 import { CANVAS_GESTURES, CanvasNavigator } from './canvas-navigator';
+import { PanelRevealer, PanelRevealProvider } from './canvas-panel-reveal';
 import { WorkflowEditReview, workflowEditProposalVisible } from './workflow-edit-review';
 import { ComposerCard, supplyReviewFormId, poolReviewFormId, poolProposalTarget, type CardRecipient, type ComposerCardData } from './composer-card';
 import { canEditCanvasAmount, canvasAmountCommand, setupSummary, bridgePairLabel, bridgeSetupNetworks, invertCanvasBridgeNetworks, type CanvasBridgeNetworks, universalCanvasNetworks } from '../domain/canvas-action-setup';
@@ -800,7 +801,7 @@ function BuildCanvas({ environment, selectedId, select, openSettings, settingsId
       {legacyMainnets.length > 0 && <button type="button" onClick={rebuildOnMainnet}>{tr('Rebuild on {0}', legacyMainnets.join(' / '))}</button>}
     </div>}
     <div ref={surfaceRef} className="flow-surface build-flow-surface" role="region" aria-label={tr("Workflow graph")} onMouseDown={startMarquee}>
-      <ReactFlow key={isLendingComposition(workflow)?'lending':'general'} nodes={nodes} edges={edges} nodeTypes={nodeTypes} onNodesChange={(changes: NodeChange<Node>[]) => onNodesChange(changes.filter(change => change.type !== 'select'))} fitViewOptions={{ padding: COMPOSER_FIT_PADDING }} minZoom={0.35} maxZoom={1.4}
+      <PanelRevealProvider><ReactFlow key={isLendingComposition(workflow)?'lending':'general'} nodes={nodes} edges={edges} nodeTypes={nodeTypes} onNodesChange={(changes: NodeChange<Node>[]) => onNodesChange(changes.filter(change => change.type !== 'select'))} fitViewOptions={{ padding: COMPOSER_FIT_PADDING }} minZoom={0.35} maxZoom={1.4}
         nodesDraggable nodesConnectable deleteKeyCode={null} selectNodesOnDrag={false} panOnDrag={[1, 2]} {...CANVAS_GESTURES}
         // BUILD-FIX-UX-001: an ordinary click never connects; a drag snaps to a nearby input; only a connection the workflow accepts is shown as valid.
         connectOnClick={false} connectionDragThreshold={4} connectionRadius={48}
@@ -819,8 +820,8 @@ function BuildCanvas({ environment, selectedId, select, openSettings, settingsId
         onEdgeClick={(_event, edge) => { selectNodes([], null); setSelectedEdge({ from: edge.source, to: edge.target }); }}
         onPaneClick={() => { if (ignorePaneClick.current) return; selectNodes([], null); }} onConnect={({ source, target, sourceHandle, targetHandle }) => connect(source, target, sourceHandle, targetHandle)}>
         <InsertionViewport workflowId={workflow.workflowId} ids={composerActions(workflow).map(node => node.nodeId)}/><HandleHitArea/>
-        <Background gap={18} size={1} color="var(--grid)" /><DarkSpotlight/><CanvasNavigator fitViewOptions={{ padding: COMPOSER_FIT_PADDING }}/>
-      </ReactFlow>
+        <Background gap={18} size={1} color="var(--grid)" /><DarkSpotlight/><CanvasNavigator fitViewOptions={{ padding: COMPOSER_FIT_PADDING }}/><PanelRevealer/>
+      </ReactFlow></PanelRevealProvider>
       {/* UX-006: an empty Canvas shows the uncommitted proposal confirmation in the empty state's place; Apply/Dismiss are unchanged. */}
       <WorkflowEditReview centered={emptyProposal}/>
       {projectedNodes.length === 0 && !emptyProposal && <div className="canvas-empty">

@@ -26,7 +26,7 @@ for (const width of [320, 375, 390, 430, 768, 1024, 1440, 1920]) {
       await expect(page.locator('#about [data-earth]')).toHaveCount(1);
       const launch = hero.getByRole('link', { name: locale === 'en' ? /Launch FloFi/ : /Abrir FloFi/ });
       const docs = hero.getByRole('link', { name: locale === 'en' ? /Explore Docs/ : /Explorar Docs/ });
-      await expect(launch).toHaveAttribute('href', '/app');
+      await expect(launch).toHaveAttribute('href', '/login');
       await expect(docs).toHaveAttribute('href', '/docs');
       await expect(headline).toBeInViewport({ ratio: 1 });
       await expect(launch).toBeInViewport({ ratio: 1 });
@@ -71,7 +71,7 @@ for (const width of [320, 375, 390, 430, 768, 1024, 1440, 1920]) {
       await expect(page.locator('#networks')).toContainText(locale === 'en' ? 'Network support varies by action.' : 'O suporte de rede varia por ação.');
       await expect(page.locator('#developers > div > a')).toHaveAttribute('href', '/docs/developer-api');
       await expect(page.locator('#documentation strong a')).toHaveAttribute('href', '/docs');
-      await expect(page.locator('#documentation > a')).toHaveAttribute('href', '/app');
+      await expect(page.locator('#documentation > a')).toHaveAttribute('href', '/login');
       const missing = await page.locator('a[href^="#"]').evaluateAll(links => links.filter(link => !document.getElementById(link.getAttribute('href')!.slice(1))).map(link => link.getAttribute('href')));
       expect(missing).toEqual([]);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

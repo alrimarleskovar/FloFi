@@ -16,6 +16,13 @@ trademarks, are excluded from the repository's source-code licenses and imply
 no endorsement. Sources and SHA-256 checksums are recorded in the
 [community link register](apps/reference-dapp/public/brand/social/sources.md).
 
+BUILD-FLOFI-AUTH-WALLETS-001: the sign-in screen shows the Google "G" and Apple
+marks on their own sign-in buttons, as inline SVG drawn to each provider's
+sign-in button guidelines (`apps/reference-dapp/src/components/account/account-icons.tsx`).
+They remain their owners' trademarks, are excluded from the repository's
+source-code licenses and imply no endorsement. Before production, the owner
+should confirm them against the providers' official downloadable button assets.
+
 This register identifies unmodified registry dependencies in the private
 reference application. The listed materials are byte-identical copies from
 SRI-verified npm archives. They retain their upstream licenses and are not

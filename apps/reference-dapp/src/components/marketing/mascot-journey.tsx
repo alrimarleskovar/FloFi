@@ -344,7 +344,7 @@ function JourneyController({ locale }: { locale: LandingLocale }) {
   return <div ref={layerRef} className={styles.layer} data-mascot-journey>
     <div ref={travelerRef} className={styles.traveler} data-mascot-traveler aria-hidden="true"><FloFiMascot/></div>
     {intro && <div className={styles.introSkip}>
-      <button type="button" onClick={() => { layerRef.current?.closest('[data-mascot-motion]')?.querySelector<HTMLAnchorElement>('a[href="/app"]')?.focus(); skipRef.current(); }}>{t.skip}<span aria-hidden="true">↗</span></button>
+      <button type="button" onClick={() => { layerRef.current?.closest('[data-mascot-motion]')?.querySelector<HTMLAnchorElement>('a[href="/login"]')?.focus(); skipRef.current(); }}>{t.skip}<span aria-hidden="true">↗</span></button>
     </div>}
   </div>;
 }

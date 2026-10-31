@@ -9,6 +9,8 @@ import { swapWalletRequestMatches, ownerBoundSwapReview, swapProfile } from '../
 import { injected, useBuild009Wallet } from './build009-wallet-store';
 import { useWorkflow } from './workflow-store';
 import { watchWalletResponse } from './wallet-request-lifecycle';
+import { bindFloFiSigning } from '../wallet/flofi-wallet-channel';
+import { floFiWalletMessage, PRE_SIGNATURE_CODES, signingContextOf } from '../wallet/flofi-signing';
 
 const KEY = 'gryloo:public-testnet-execution-id';
 /**
@@ -38,6 +40,8 @@ function unwrap<T>(result: { ok: true; value: T } | { ok: false; code: string })
 }
 function message(error: unknown): string {
   const code = error instanceof Error ? error.message : '';
+  const floFi = code.startsWith('FLOFI_WALLET_') ? floFiWalletMessage(code) : null;
+  if (floFi) return floFi;
   const messages: Record<string, string> = {
     PUBLIC_RECORDING_OFF: 'Public testnet recording is not enabled on this app instance.',
     ROBINHOOD_MAINNET_NOT_ENABLED: 'Robinhood Chain is not enabled on this app instance.',
@@ -71,8 +75,16 @@ function message(error: unknown): string {
   };
   return messages[code] ?? (code.startsWith('PUBLIC_') ? 'The public testnet request could not be completed. Try again.' : code || 'Could not continue. Try again.');
 }
-function rejected(error: unknown): boolean {
-  return !!error && typeof error === 'object' && 'code' in error && (error.code === 4001 || error.code === 'ACTION_REJECTED');
+/** FloFi Wallet's own code when it refused before any signing activity existed (EIP-1193 4100 with a proven pre-signature code). */
+export function floFiRefusal(error: unknown): string | null {
+  const data = error && typeof error === 'object' && 'code' in error && error.code === 4100 && 'data' in error ? (error as { data?: unknown }).data : null;
+  const code = data && typeof data === 'object' && 'code' in data && typeof data.code === 'string' ? data.code : null;
+  return code && PRE_SIGNATURE_CODES.has(code) ? code : null;
+}
+export function rejected(error: unknown): boolean {
+  // BUILD-FLOFI-AUTH-WALLETS-001: a FloFi Wallet refusal proven to come before any signature is a rejection too (nothing exists to observe);
+  // any other 4100, and every unclear outcome, stays UNKNOWN as before.
+  return !!error && typeof error === 'object' && 'code' in error && (error.code === 4001 || error.code === 'ACTION_REJECTED' || floFiRefusal(error) !== null);
 }
 async function calldataDigest(data: string): Promise<string> {
   const bytes = new TextEncoder().encode(data);
@@ -208,12 +220,16 @@ export function PublicTestnetProvider({ children }: { children: ReactNode }) {
     let hash: unknown;
     busyRef.current = false; setBusy(null);
     setSigningAttempt(attempt.attemptId);
+    // BUILD-FLOFI-AUTH-WALLETS-001: FloFi Wallet signs only for the reviewed run it is told about (no effect on any other wallet).
+    bindFloFiSigning(provider, signingContextOf(run.quote.executionId, 'base-sepolia-swap'));
     try { hash = await watchWalletResponse(provider, () => provider.request({ method: 'eth_sendTransaction', params: [tx] }), () => {
       clearSigning();
       void publicReport(run.quote.executionId, attempt.attemptId, { kind: 'UNKNOWN' }).then(result => { if (result.ok) acceptCurrent(result.value); }).catch(() => undefined);
     }); }
     catch (cause) {
       acceptCurrent(unwrap(await publicReport(run.quote.executionId, attempt.attemptId, { kind: rejected(cause) ? 'REJECTED' : 'UNKNOWN' })));
+      const refusal = floFiRefusal(cause);
+      if (refusal) throw new Error(refusal, { cause });
       if (rejected(cause)) throw new Error('WALLET_AUTHORIZATION_REJECTED', { cause });
       throw new Error('SUBMISSION_RESULT_UNKNOWN', { cause });
     }

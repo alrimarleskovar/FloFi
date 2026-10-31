@@ -51,6 +51,7 @@ import { createLendingRpc } from '../src/server/lending-rpc.ts';
 import { createPaymentFlowService, PAYMENT_RUN_ID, paymentNeedsObservation, type PaymentRecord, type PaymentWalletResult } from '../src/server/payment-flow-service.ts';
 import { paymentMode, paymentRuntime } from '../src/server/payment-runtime.ts';
 import { MAX_LOG_BYTES } from '@defi-workflow-engine/cloud-runtime';
+import { createManagedWalletEvm, type ManagedEvmExpected } from '../src/server/managed-wallet-evm.ts';
 
 export type FlowName = `crosschain-router-${EthereumRouterNetwork}` | 'robinhood-transfer' | 'aave-supply' | 'base-sepolia-swap' | 'solana-devnet-swap' | 'orca-liquidity' | 'jupiter-swap' | 'uniswap-liquidity' | 'crosschain-router'
   /** BUILD-SOLANA-MAINNET-001: Orca Whirlpools liquidity on Solana mainnet-beta (real funds), the same service as `orca-liquidity` on its own storage. */
@@ -64,7 +65,9 @@ export type FlowName = `crosschain-router-${EthereumRouterNetwork}` | 'robinhood
   /** BUILD-SOLANA-TRANSFER-UX-001: direct SOL / SPL transfers to another wallet on mainnet-beta (real funds) and Devnet. */
   | 'solana-transfer' | 'solana-devnet-transfer'
   /** BUILD-CROSSCHAIN-UNIVERSAL-001: the universal Cross-chain Router across the five mainnets (Relay Depository, verified). */
-  | 'crosschain-universal';
+  | 'crosschain-universal'
+  /** BUILD-FLOFI-AUTH-WALLETS-001: FloFi Wallet's EVM reads and attempt-bound broadcast on the four catalog mainnets (no runs of its own). */
+  | 'managed-wallet-evm';
 export type Rpc = (method: string, params: readonly unknown[]) => Promise<unknown>;
 /** Network transport for one flow. Built from configuration in production; replaced by MOCKED chains in tests. */
 export type FlowDeps = { readonly rpc: Rpc; readonly mode: 'live' | 'harness'; readonly env: Readonly<Record<string, string | undefined>>; readonly http?: JupiterHttp;
@@ -1000,6 +1003,42 @@ const pixPayment: FlowDefinition = {
   ownership: { policy: PAYMENT_OWNERSHIP, ownerOf: record => (record as PaymentRecord).facts.owner.address },
 };
 
+const QUANTITY_ARG = /^0x(?:0|[1-9a-f][0-9a-f]{0,63})$/, RAW_TX = /^0x02(?:[0-9a-f]{2}){1,131072}$/, DATA_ARG = /^0x(?:[0-9a-f]{2}){0,131072}$/;
+const NUMBER_ARG = /^(?:0x[0-9a-f]{1,64}|0|[1-9][0-9]{0,77})$/;
+const chainIdArg = (value: unknown) => typeof value === 'string' && QUANTITY_ARG.test(value);
+const expectedTx = (value: unknown) => isObject(value) && Object.keys(value).length === 9 && typeof value.hash === 'string' && HASH.test(value.hash)
+  && ['from', 'to'].every(key => typeof value[key] === 'string' && ACCOUNT.test(value[key] as string)) && typeof value.data === 'string' && DATA_ARG.test(value.data)
+  && ['value', 'nonce', 'gas', 'maxFeePerGas', 'maxPriorityFeePerGas'].every(key => typeof value[key] === 'string' && NUMBER_ARG.test(value[key] as string));
+/**
+ * BUILD-FLOFI-AUTH-WALLETS-001: FloFi Wallet's EVM network side on hosted deployments (spec §4). The product server action has already
+ * verified the account session, re-resolved the reviewed attempt through its own flow and checked the owner is a managed wallet of that
+ * account; this flow re-checks the signed bytes against those exact fields and the network's own gates (`GRYLOO_<NET>_MAINNET`, and
+ * `GRYLOO_<NET>_OWNER_EXECUTION` for a broadcast) and sends at most once. It keeps no runs: nothing to project, observe or archive.
+ */
+const managedWalletEvm: FlowDefinition = {
+  name: 'managed-wallet-evm', busyCode: 'MANAGED_WALLET_EVM_BUSY', runId: /(?!)/, unavailableCode: 'FLOFI_WALLET_NETWORK_READ_FAILED',
+  methods: {
+    pendingNonce: { mutates: false, validate: shape(chainIdArg, account) },
+    fees: { mutates: false, validate: shape(chainIdArg) },
+    broadcast: { mutates: true, validate: shape(chainIdArg, value => typeof value === 'string' && RAW_TX.test(value), expectedTx) },
+  },
+  transport: () => ({ rpc: networkNotEnabled('FLOFI_WALLET_NETWORK_UNSUPPORTED') }),
+  create(_storage, { env }) {
+    // Each catalog network keeps its own gate; a hosted deployment never talks to a loopback harness.
+    const s = createManagedWalletEvm({ env, mode: network => { const mode = network.mode(env); return mode === 'harness' && isHostedDeployment(env) ? 'off' : mode; } });
+    const table: Record<string, (args: Args) => Promise<unknown>> = {
+      pendingNonce: ([chain, address]) => s.pendingNonce(chain, address),
+      fees: ([chain]) => s.fees(chain),
+      broadcast: ([chain, raw, expected]) => s.broadcast(chain, raw, expected as ManagedEvmExpected),
+    };
+    const none = async () => { throw new Error('MANAGED_WALLET_EVM_HAS_NO_RUNS'); };
+    return { call: (method, args) => table[method]!(args), load: none, observe: none };
+  },
+  needsObservation: () => false,
+  projector: () => null,
+  evidence: () => null,
+};
+
 export const FLOWS: Readonly<Record<FlowName, FlowDefinition>> = Object.freeze({ 'robinhood-transfer': robinhood, 'aave-supply': supply, 'base-sepolia-swap': swap,
   'solana-devnet-swap': solanaDevnetSwap, 'orca-liquidity': orcaLiquidity, 'jupiter-swap': jupiterSwap, 'uniswap-liquidity': uniswapLiquidity,
   'orca-liquidity-mainnet': orcaLiquidityFlow('orca-liquidity-mainnet', ORCA_WHIRLPOOLS_MAINNET_LIQUIDITY),
@@ -1020,7 +1059,7 @@ export const FLOWS: Readonly<Record<FlowName, FlowDefinition>> = Object.freeze({
   'crosschain-router-robinhood-to-ethereum': routerFlow('crosschain-router-robinhood-to-ethereum', 'robinhood-to-ethereum'),
   'crosschain-router-arbitrum-to-base': routerFlow('crosschain-router-arbitrum-to-base', 'arbitrum-to-base'), 'solana-devnet-composition': solanaComposition,
   'solana-transfer': solanaTransferFlow('solana-transfer', SOLANA_MAINNET_TRANSFER), 'solana-devnet-transfer': solanaTransferFlow('solana-devnet-transfer', SOLANA_DEVNET_TRANSFER),
-  'crosschain-universal': crosschainUniversal });
+  'crosschain-universal': crosschainUniversal, 'managed-wallet-evm': managedWalletEvm });
 export const isFlowName = (value: string): value is FlowName => Object.hasOwn(FLOWS, value);
 
 /**
@@ -1080,6 +1119,11 @@ function configuredFlowMode(flow: FlowName, env: Readonly<Record<string, string 
   if (flow === 'crosschain-router-arbitrum-to-base') return routerNetworkMode('arbitrum-to-base', env);
   // BUILD-CROSSCHAIN-UNIVERSAL-001: `GRYLOO_UNIVERSAL_ROUTER=live` (read-only), owner execution additionally needs its real-funds opt-in; the harness wins.
   if (flow === 'crosschain-universal') return universalRouterMode(env);
+  // BUILD-FLOFI-AUTH-WALLETS-001: on wherever a catalog mainnet is (each call re-checks its own network's gates).
+  if (flow === 'managed-wallet-evm') {
+    const modes = Object.values(CATALOG_NETWORKS).map(network => network.mode(env));
+    return modes.includes('harness') ? 'harness' : modes.includes('live') ? 'live' : 'off';
+  }
   if (flow === 'robinhood-transfer') {
     if (env.GRYLOO_ROBINHOOD_HARNESS === 'MOCKED_LOOPBACK_ONLY') return 'harness';
     return env.GRYLOO_ROBINHOOD_TESTNET === 'live' || env.GRYLOO_ETHEREUM_SEPOLIA_TRANSFER === 'live' ? 'live' : 'off';
@@ -1107,5 +1151,5 @@ const DISABLED: Readonly<Record<FlowName, string>> = { 'robinhood-transfer': 'TR
   'base-aave': 'BASE_MAINNET_NOT_ENABLED', 'arbitrum-aave': 'ARBITRUM_MAINNET_NOT_ENABLED', 'crosschain-router-arbitrum-to-base': 'ROUTER_NOT_ENABLED',
   'solana-devnet-composition': 'SOLANA_COMPOSITION_PUBLIC_DEVNET_NOT_ENABLED',
   'solana-transfer': 'SOLANA_TRANSFER_PUBLIC_MAINNET_NOT_ENABLED', 'solana-devnet-transfer': 'SOLANA_TRANSFER_PUBLIC_DEVNET_NOT_ENABLED',
-  'crosschain-universal': 'UNIVERSAL_ROUTER_NOT_ENABLED' };
+  'crosschain-universal': 'UNIVERSAL_ROUTER_NOT_ENABLED', 'managed-wallet-evm': 'FLOFI_WALLET_NETWORK_UNSUPPORTED' };
 export const disabledCode = (flow: FlowName) => DISABLED[flow];

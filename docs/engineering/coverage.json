@@ -14,6 +14,34 @@
       "path": "packages/action-registry/test/execution-capabilities.test.ts",
       "stage": "unit"
     },
+    "app.accounts.account-csp": {
+      "path": "apps/reference-dapp/src/accounts/account-csp.test.ts",
+      "stage": "unit"
+    },
+    "app.accounts.account-model": {
+      "path": "apps/reference-dapp/src/accounts/account-model.test.ts",
+      "stage": "unit"
+    },
+    "app.accounts.account-service.pg": {
+      "path": "apps/reference-dapp/src/accounts/account-service.pg.test.ts",
+      "stage": "postgres"
+    },
+    "app.accounts.account-session": {
+      "path": "apps/reference-dapp/src/accounts/account-session.test.ts",
+      "stage": "unit"
+    },
+    "app.accounts.account-store.pg": {
+      "path": "apps/reference-dapp/src/accounts/account-store.pg.test.ts",
+      "stage": "postgres"
+    },
+    "app.accounts.oidc": {
+      "path": "apps/reference-dapp/src/accounts/oidc.test.ts",
+      "stage": "unit"
+    },
+    "app.accounts.turnkey-server": {
+      "path": "apps/reference-dapp/src/accounts/turnkey-server.test.ts",
+      "stage": "unit"
+    },
     "app.admin.analytics.workflows": {
       "path": "apps/reference-dapp/src/admin/analytics/workflows.test.ts",
       "stage": "unit"
@@ -94,6 +122,10 @@
       "path": "apps/reference-dapp/src/channels/whatsapp/learning.pg.test.ts",
       "stage": "postgres"
     },
+    "app.components.account.sign-in": {
+      "path": "apps/reference-dapp/src/components/account/sign-in.test.tsx",
+      "stage": "unit"
+    },
     "app.config.product": {
       "path": "apps/reference-dapp/src/config/product.test.ts",
       "stage": "unit"
@@ -145,6 +177,10 @@
     "app.domain.intelligence.conversation-regression": {
       "path": "apps/reference-dapp/src/domain/intelligence/conversation-regression.test.ts",
       "stage": "unit"
+    },
+    "app.e2e.auth-wallets": {
+      "path": "apps/reference-dapp/e2e/auth-wallets.spec.ts",
+      "stage": "browser"
     },
     "app.e2e.build-entry": {
       "path": "apps/reference-dapp/e2e/build-entry.spec.ts",
@@ -350,6 +386,10 @@
       "path": "packages/cloud-runtime/test/evidence-telemetry.test.ts",
       "stage": "unit"
     },
+    "cloud-runtime.flofi-accounts-migration.pg": {
+      "path": "packages/cloud-runtime/test/flofi-accounts-migration.pg.test.ts",
+      "stage": "postgres"
+    },
     "cloud-runtime.forward-compatibility.pg": {
       "path": "packages/cloud-runtime/test/forward-compatibility.pg.test.ts",
       "stage": "postgres"
@@ -500,6 +540,126 @@
     },
     "workflow-contracts.revision-state": {
       "path": "packages/workflow-contracts/test/revision-state.test.ts",
+      "stage": "unit"
+    },
+    "app.accounts.wallet-relay": {
+      "path": "apps/reference-dapp/src/accounts/wallet-relay.test.ts",
+      "stage": "unit"
+    },
+    "app.accounts.wallet-service.pg": {
+      "path": "apps/reference-dapp/src/accounts/wallet-service.pg.test.ts",
+      "stage": "postgres"
+    },
+    "app.accounts.wallet-session": {
+      "path": "apps/reference-dapp/src/accounts/wallet-session.test.ts",
+      "stage": "unit"
+    },
+    "app.app.flofi-wallet-signing": {
+      "path": "apps/reference-dapp/src/app/flofi-wallet-signing.test.ts",
+      "stage": "unit"
+    },
+    "app.server.managed-signing": {
+      "path": "apps/reference-dapp/src/server/managed-signing.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet-app.arming": {
+      "path": "apps/reference-dapp/src/wallet-app/arming.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet-app.boundaries": {
+      "path": "apps/reference-dapp/src/wallet-app/boundaries.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet-app.channel": {
+      "path": "apps/reference-dapp/src/wallet-app/channel.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet-app.email-unlock": {
+      "path": "apps/reference-dapp/src/wallet-app/email-unlock.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet-app.evm-transaction": {
+      "path": "apps/reference-dapp/src/wallet-app/evm-transaction.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet-app.oidc-wait": {
+      "path": "apps/reference-dapp/src/wallet-app/oidc-wait.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet-app.protocol": {
+      "path": "apps/reference-dapp/src/wallet-app/protocol.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet-app.provider-client": {
+      "path": "apps/reference-dapp/src/wallet-app/provider-client.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet-app.sign-in-message": {
+      "path": "apps/reference-dapp/src/wallet-app/sign-in-message.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet-app.solana-transaction": {
+      "path": "apps/reference-dapp/src/wallet-app/solana-transaction.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet-app.wallet-api": {
+      "path": "apps/reference-dapp/src/wallet-app/wallet-api.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet-app.wallet-i18n": {
+      "path": "apps/reference-dapp/src/wallet-app/wallet-i18n.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet.flofi-discovery": {
+      "path": "apps/reference-dapp/src/wallet/flofi-discovery.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet.flofi-evm-provider": {
+      "path": "apps/reference-dapp/src/wallet/flofi-evm-provider.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet.flofi-signing": {
+      "path": "apps/reference-dapp/src/wallet/flofi-signing.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet.flofi-solana-wallet": {
+      "path": "apps/reference-dapp/src/wallet/flofi-solana-wallet.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet.flofi-wallet-channel": {
+      "path": "apps/reference-dapp/src/wallet/flofi-wallet-channel.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet.flofi-wallet-sync": {
+      "path": "apps/reference-dapp/src/wallet/flofi-wallet-sync.test.ts",
+      "stage": "unit"
+    },
+    "app.accounts.wallet-origin": {
+      "path": "apps/reference-dapp/src/accounts/wallet-origin.test.ts",
+      "stage": "unit"
+    },
+    "app.app.wallet-session-action": {
+      "path": "apps/reference-dapp/src/app/wallet-session-action.test.ts",
+      "stage": "unit"
+    },
+    "app.wallet-app.wallet-app": {
+      "path": "apps/reference-dapp/src/wallet-app/wallet-app.test.tsx",
+      "stage": "unit"
+    },
+    "app.wallet-app.wallet-render": {
+      "path": "apps/reference-dapp/src/wallet-app/wallet-render.test.tsx",
+      "stage": "unit"
+    },
+    "app.server.managed-wallet-evm": {
+      "path": "apps/reference-dapp/src/server/managed-wallet-evm.test.ts",
+      "stage": "unit"
+    },
+    "app.components.flofi-wallet-continue": {
+      "path": "apps/reference-dapp/src/components/flofi-wallet-continue.test.tsx",
+      "stage": "unit"
+    },
+    "app.components.canvas-panel-reveal": {
+      "path": "apps/reference-dapp/src/components/canvas-panel-reveal.test.ts",
       "stage": "unit"
     }
   },
@@ -2072,6 +2232,7 @@
         "apps/reference-dapp/src/components/canvas-card-inputs.tsx",
         "apps/reference-dapp/src/components/canvas-lifecycle-action.tsx",
         "apps/reference-dapp/src/components/canvas-navigator.tsx",
+        "apps/reference-dapp/src/components/canvas-panel-reveal.tsx",
         "apps/reference-dapp/src/components/composer-card.tsx",
         "apps/reference-dapp/src/components/composition-panel.tsx",
         "apps/reference-dapp/src/components/connections-panel.tsx",
@@ -2147,6 +2308,7 @@
         "apps/reference-dapp/src/components/workflow-run-panel.tsx"
       ],
       "suites": [
+        "app.components.canvas-panel-reveal",
         "app.e2e.build-entry",
         "app.e2e.canvas-keyboard",
         "app.e2e.global-product-polish",
@@ -5955,6 +6117,141 @@
       "gaps": [
         "Mapped suites are representative boundary tests, not exhaustive path or public execution coverage.",
         "Mapped fork suites include existing owner-gated cases that may skip; a successful stage is not proof those optional cases ran."
+      ]
+    },
+    {
+      "id": "accounts--identity-wallets",
+      "primary": "flofi-security",
+      "dependencies": [
+        "flofi-data-privacy",
+        "flofi-frontend-ux",
+        "flofi-infrastructure-ci",
+        "flofi-wallet-execution"
+      ],
+      "sharedFinancialCore": false,
+      "sources": [
+        "apps/reference-dapp/playwright.auth-wallets.config.ts",
+        "apps/reference-dapp/src/accounts/account-csp.ts",
+        "apps/reference-dapp/src/accounts/account-host.ts",
+        "apps/reference-dapp/src/accounts/account-model.ts",
+        "apps/reference-dapp/src/accounts/account-service.ts",
+        "apps/reference-dapp/src/accounts/account-session.ts",
+        "apps/reference-dapp/src/accounts/account-store.ts",
+        "apps/reference-dapp/src/accounts/account-theme.ts",
+        "apps/reference-dapp/src/accounts/oidc-callback.ts",
+        "apps/reference-dapp/src/accounts/oidc.ts",
+        "apps/reference-dapp/src/accounts/otp-browser.ts",
+        "apps/reference-dapp/src/accounts/turnkey-server.ts",
+        "apps/reference-dapp/src/accounts/wallet-host.ts",
+        "apps/reference-dapp/src/accounts/wallet-origin.ts",
+        "apps/reference-dapp/src/accounts/wallet-relay.ts",
+        "apps/reference-dapp/src/accounts/wallet-service.ts",
+        "apps/reference-dapp/src/accounts/wallet-session.ts",
+        "apps/reference-dapp/src/app/(account)/layout.tsx",
+        "apps/reference-dapp/src/app/(account)/login/page.tsx",
+        "apps/reference-dapp/src/app/(account)/onboarding/page.tsx",
+        "apps/reference-dapp/src/app/(account)/onboarding/wallets/page.tsx",
+        "apps/reference-dapp/src/app/(wallet)/layout.tsx",
+        "apps/reference-dapp/src/app/(wallet)/wallet/callback/[provider]/route.ts",
+        "apps/reference-dapp/src/app/(wallet)/wallet/done/page.tsx",
+        "apps/reference-dapp/src/app/(wallet)/wallet/page.tsx",
+        "apps/reference-dapp/src/app/account-action.ts",
+        "apps/reference-dapp/src/app/api/wallet/export/route.ts",
+        "apps/reference-dapp/src/app/api/wallet/provider/[...path]/route.ts",
+        "apps/reference-dapp/src/app/api/wallet/session/route.ts",
+        "apps/reference-dapp/src/app/api/wallet/sign-context/route.ts",
+        "apps/reference-dapp/src/app/api/wallet/unlock/email/route.ts",
+        "apps/reference-dapp/src/app/api/wallet/unlock/oidc/route.ts",
+        "apps/reference-dapp/src/app/api/wallet/wallets/route.ts",
+        "apps/reference-dapp/src/app/auth/callback/apple/route.ts",
+        "apps/reference-dapp/src/app/auth/callback/google/route.ts",
+        "apps/reference-dapp/src/app/flofi-wallet-action.ts",
+        "apps/reference-dapp/src/app/flofi-wallet-signing.ts",
+        "apps/reference-dapp/src/components/account/account-icons.tsx",
+        "apps/reference-dapp/src/components/account/account-messages.ts",
+        "apps/reference-dapp/src/components/account/account-shell.tsx",
+        "apps/reference-dapp/src/components/account/account-wallets.tsx",
+        "apps/reference-dapp/src/components/account/account.module.css",
+        "apps/reference-dapp/src/components/account/add-wallets.tsx",
+        "apps/reference-dapp/src/components/account/sign-in.tsx",
+        "apps/reference-dapp/src/components/account/wallet-intro.tsx",
+        "apps/reference-dapp/src/components/flofi-wallet-continue.tsx",
+        "apps/reference-dapp/src/i18n/pt-accounts.ts",
+        "apps/reference-dapp/src/i18n/pt-wallet.ts",
+        "apps/reference-dapp/src/server/managed-signing.ts",
+        "apps/reference-dapp/src/server/managed-wallet-evm.ts",
+        "apps/reference-dapp/src/wallet-app/arming.ts",
+        "apps/reference-dapp/src/wallet-app/channel.ts",
+        "apps/reference-dapp/src/wallet-app/email-unlock.ts",
+        "apps/reference-dapp/src/wallet-app/evm-transaction.ts",
+        "apps/reference-dapp/src/wallet-app/oidc-wait.ts",
+        "apps/reference-dapp/src/wallet-app/operations.tsx",
+        "apps/reference-dapp/src/wallet-app/protocol.ts",
+        "apps/reference-dapp/src/wallet-app/provider-client.ts",
+        "apps/reference-dapp/src/wallet-app/request-parts.tsx",
+        "apps/reference-dapp/src/wallet-app/sign-in-message.ts",
+        "apps/reference-dapp/src/wallet-app/signing.tsx",
+        "apps/reference-dapp/src/wallet-app/solana-transaction.ts",
+        "apps/reference-dapp/src/wallet-app/unlock-panel.tsx",
+        "apps/reference-dapp/src/wallet-app/wallet-api.ts",
+        "apps/reference-dapp/src/wallet-app/wallet-app.tsx",
+        "apps/reference-dapp/src/wallet-app/wallet-done.tsx",
+        "apps/reference-dapp/src/wallet-app/wallet-messages.ts",
+        "apps/reference-dapp/src/wallet-app/wallet-shell.tsx",
+        "apps/reference-dapp/src/wallet-app/wallet.module.css",
+        "apps/reference-dapp/src/wallet/flofi-evm-provider.ts",
+        "apps/reference-dapp/src/wallet/flofi-signing.ts",
+        "apps/reference-dapp/src/wallet/flofi-solana-wallet.ts",
+        "apps/reference-dapp/src/wallet/flofi-wallet-channel.ts",
+        "apps/reference-dapp/src/wallet/flofi-wallet-sync.ts",
+        "packages/cloud-runtime/migrations/0018_flofi_accounts.sql"
+      ],
+      "suites": [
+        "app.accounts.account-csp",
+        "app.accounts.account-model",
+        "app.accounts.account-service.pg",
+        "app.accounts.account-session",
+        "app.accounts.account-store.pg",
+        "app.accounts.oidc",
+        "app.accounts.turnkey-server",
+        "app.accounts.wallet-origin",
+        "app.accounts.wallet-relay",
+        "app.accounts.wallet-service.pg",
+        "app.accounts.wallet-session",
+        "app.app.flofi-wallet-signing",
+        "app.app.wallet-session-action",
+        "app.components.account.sign-in",
+        "app.components.flofi-wallet-continue",
+        "app.e2e.auth-wallets",
+        "app.server.managed-signing",
+        "app.server.managed-wallet-evm",
+        "app.wallet-app.arming",
+        "app.wallet-app.boundaries",
+        "app.wallet-app.channel",
+        "app.wallet-app.email-unlock",
+        "app.wallet-app.evm-transaction",
+        "app.wallet-app.oidc-wait",
+        "app.wallet-app.protocol",
+        "app.wallet-app.provider-client",
+        "app.wallet-app.sign-in-message",
+        "app.wallet-app.solana-transaction",
+        "app.wallet-app.wallet-api",
+        "app.wallet-app.wallet-app",
+        "app.wallet-app.wallet-i18n",
+        "app.wallet-app.wallet-render",
+        "app.wallet.flofi-discovery",
+        "app.wallet.flofi-evm-provider",
+        "app.wallet.flofi-signing",
+        "app.wallet.flofi-solana-wallet",
+        "app.wallet.flofi-wallet-channel",
+        "app.wallet.flofi-wallet-sync",
+        "cloud-runtime.flofi-accounts-migration.pg"
+      ],
+      "gaps": [
+        "Live Google, Apple and Turnkey integrations are unverified: suites use test RSA keys, an in-process provider stand-in and the MOCKED loopback harness (e2e/account-harness.ts). They certify FloFi's verification, isolation and authorization rules, not the providers.",
+        "Turnkey activity versions and result shapes come from @turnkey/http 6.7.0 declarations; confirm on a Turnkey test organization before enabling production.",
+        "Managed wallets cannot sign FloFi transactions in this build (no signing adapter; disclosed in the product and a release blocker); Build/Simulate/Execute regressions are covered by the existing suites, not by this module.",
+        "Email sign-up uses Turnkey's legacy OTP activities, which CREATE_SUB_ORGANIZATION_V8 does not accept per Turnkey's migration guide; the encrypted OTP flow (@turnkey/crypto) is a release blocker pending an owner dependency decision."
       ]
     }
   ],

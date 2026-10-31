@@ -87,7 +87,7 @@ test('landing uses native Docs and developer pages while launch remains /app', a
   for (const link of await buildLinks.all()) await expect(link).toHaveAttribute('href', '/docs/developer-api');
   await expect(page.getByRole('link', { name: /Explore Docs/ })).toHaveAttribute('href', '/docs');
   await expect(page.getByRole('link', { name: /Developer documentation/ })).toHaveAttribute('href', '/docs');
-  for (const link of await page.getByRole('link', { name: /Launch (Beta )?FloFi/ }).all()) await expect(link).toHaveAttribute('href', '/app');
+  for (const link of await page.getByRole('link', { name: /Launch (Beta )?FloFi/ }).all()) await expect(link).toHaveAttribute('href', '/login');
   await docs.first().click(); await expect(page).toHaveURL(/\/docs$/); await expect(page.getByRole('heading', { name: 'Documentation', exact: true })).toBeVisible();
 });
 

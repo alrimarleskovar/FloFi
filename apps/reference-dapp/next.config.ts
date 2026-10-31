@@ -27,6 +27,9 @@ const config: NextConfig = {
     const cardProvider = 'https://api.mercadopago.com https://api-static.mercadopago.com https://secure-fields.mercadopago.com';
     return [{ source: '/:path*', headers: [{ key: 'Content-Security-Policy', value: `connect-src 'self' ${cardProvider}` }] },
       { source: '/approve', headers: sensitive }, { source: '/connections', headers: sensitive },
+      // BUILD-FLOFI-AUTH-WALLETS-001: sign-in, wallet onboarding and Credentials (wallet import/export) are never framed by another site.
+      ...['/login', '/onboarding', '/onboarding/:path*', '/app/credentials'].map(source => ({ source, headers: [{ key: 'X-Frame-Options', value: 'DENY' },
+        { key: 'Content-Security-Policy', value: `connect-src 'self' ${cardProvider}; frame-ancestors 'none'` }, { key: 'Referrer-Policy', value: 'no-referrer' }] })),
       // BUILD-ADMIN-001: the private console and its APIs are never framed, cached, indexed or referred either.
       { source: '/admin', headers: sensitive }, { source: '/admin/:path*', headers: sensitive }];
   },

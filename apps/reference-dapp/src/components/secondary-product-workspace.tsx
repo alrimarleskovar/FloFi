@@ -20,6 +20,7 @@ import { ECOSYSTEM_LABEL, type WalletEcosystem } from '../wallet/wallet-registry
 import { addProviderCard, cardProviderStatus, removeProviderCard } from '../app/card-action';
 import type { CardProviderClient, CardProviderStatus } from '../server/card-provider';
 import { loadMercadoPago, type MercadoPagoInstance, type MercadoPagoSecureField, type SecureFieldType } from './card-secure-fields';
+import { AccountWalletsSection } from './account/account-wallets';
 
 type IconName = 'wallet' | 'agent' | 'key' | 'plus' | 'copy' | 'card' | 'secret';
 function WorkspaceIcon({ name, size = 20 }: { name: IconName; size?: number }) {
@@ -312,6 +313,9 @@ function CredentialsWorkspace({ access }: { access?: DelegationAccess | undefine
   return <>
     <header className="secondary-workspace-heading"><h1>{tr("Credentials")}</h1><p>{tr("Keep the wallets and cards you use with FloFi in one place. Saved credentials are references only: they never approve a transaction or a payment.")}</p></header>
     <p className="workspace-notice" role="status">{tr(status || connection.error || '')}</p>
+    {/* BUILD-FLOFI-AUTH-WALLETS-001: wallets saved to the signed-in FloFi account (server-side, per account). The device-local
+        references below keep their own storage and semantics. */}
+    <AccountWalletsSection active={active.map(wallet => ({ ecosystem: wallet.ecosystem, address: wallet.address }))}/>
     <section className="workspace-section" aria-labelledby="credentials-wallets">
       <div className="workspace-section-heading"><div><WorkspaceIcon name="wallet"/><h2 id="credentials-wallets">{tr("Wallets")}</h2><span className="workspace-count">{entries.length}</span></div>
         <button type="button" className="workspace-action" disabled={busy} onClick={() => void addWallet()}><WorkspaceIcon name="plus" size={16}/>{tr("Add wallet")}</button></div>

@@ -21,6 +21,8 @@ import { isPristineDraft } from '../domain/initial-workflow';
 import { useProductBootstrap } from './product-bootstrap';
 import { rememberWalletHint } from '../wallet/wallet-hint';
 import { WALLET_RESTORE_TIMEOUT_MS } from './wallet-restore';
+import { bindFloFiSigning } from '../wallet/flofi-wallet-channel';
+import { signingContextOf } from '../wallet/flofi-signing';
 
 /**
  * One Solana swap store for both runtimes of the canonical swap. The workflow's cluster selects the runtime:
@@ -266,6 +268,8 @@ export function JupiterProvider({ children }: { children: ReactNode }) {
       if (begin.value.walletChain !== current.chain) throw new Error(`${api.prefix}_WRONG_CLUSTER`);
       if (JSON.stringify(latest.current) !== JSON.stringify(snapshot)) throw new Error(`${api.prefix}_SEMANTIC_REVISION_CHANGED`);
       // The sole owner-signature request, reachable only from the owner's Execute click.
+      // BUILD-FLOFI-AUTH-WALLETS-001: FloFi Wallet signs only for the reviewed run it is told about (no effect on any other wallet).
+      bindFloFiSigning(current.wallet, signingContextOf(record.id, 'jupiter-swap'));
       signed = await signWithSolanaWallet(current, begin.value.unsignedTransaction, api.prefix, () => {
         if (latestSession.current !== current) throw new Error(`${api.prefix}_WALLET_CHANGED`);
         if (JSON.stringify(latest.current) !== JSON.stringify(snapshot)) throw new Error(`${api.prefix}_SEMANTIC_REVISION_CHANGED`);

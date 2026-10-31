@@ -233,7 +233,7 @@ test.describe('motion allowed', () => {
       await expect(execute.locator('li[data-status="active"]')).toHaveCount(0);
       await expect(demo.locator('[data-demo-card][data-state="shown"]')).toHaveCount(2);
       const cta = demo.getByRole('link', { name: /Try it in FloFi/ });
-      await expect(cta).toBeVisible(); await expect(cta).toHaveAttribute('href', '/app');
+      await expect(cta).toBeVisible(); await expect(cta).toHaveAttribute('href', '/login');
       await expect(demo.getByRole('button', { name: 'Replay the illustration' })).toBeVisible();
       await expect(demo).toContainText('No wallet is connected and nothing is sent.');
       await expect(demo.locator('[data-demo-card="borrow"]')).toContainText('Borrowing limit checked in simulation');

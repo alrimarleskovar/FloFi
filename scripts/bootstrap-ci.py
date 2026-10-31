@@ -20,8 +20,8 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from governance_lite import (AGE_WAIVER, APPROVED_AGE_WAIVERS, LEGACY_AGE_WAIVERS,
-                             dependency_age_waivers, dependency_release_age_allowed)
+from governance_lite import (AGE_WAIVER, APPROVED_AGE_WAIVERS, LEGACY_AGE_WAIVERS, dependency_age_waivers,
+                             dependency_release_age_allowed)
 from ci_archive_cache import verified_archive
 
 NODE_VERSION = "24.21.0"
@@ -392,7 +392,20 @@ BUILDMCP001_DIRECT_VERSIONS = {
 # GHSA-mrhx-c7xc-m3w5: the MCP SDK's zod moves 4.6.5 → 4.6.6 by exact override (MIT, no dependencies); the count is unchanged.
 # GHSA-w74x-v6f9-j3xg, GHSA-wjr9-j795-jxcr, GHSA-xhq7-xmqj-769h, GHSA-333x-w4r6-6crp: ajv's fast-uri moves 3.1.8 → 3.1.9 by exact
 # override (BSD-3-Clause, no dependencies); the count is unchanged.
-REGISTRY_PACKAGE_COUNT = 264
+# BUILD-FLOFI-AUTH-WALLETS-001 adds 8 (Apache-2.0/MIT): @turnkey/iframe-stamper (no dependencies) and @turnkey/indexed-db-stamper
+# with @turnkey/encoding, @turnkey/sdk-types, bs58, bs58check, base-x and @noble/hashes. Owner review: these are the provider's
+# isolated import/export iframe bridge and its non-extractable WebCrypto session-key stamper; FloFi holds no wallet key.
+# BUILD-FLOFI-AUTH-WALLETS-001 (encrypted email codes) adds 23 with @turnkey/crypto@2.13.3 (Apache-2.0): @noble/ciphers@1.3.0,
+# @noble/curves@1.9.0, borsh, cbor-js, @peculiar/x509 and its asn1 packages, asn1js, pvtsutils, pvutils, reflect-metadata, tsyringe and
+# tslib@1.14.1 (0BSD, exact identity below). Owner review: Turnkey's own encryption of the email code to its enclave (verified enclave
+# signature, HPKE) and verification-token check; FloFi writes no cryptography. No install scripts; no eval/new Function.
+REGISTRY_PACKAGE_COUNT = 295
+# BUILD-FLOFI-AUTH-WALLETS-001: the embedded-wallet provider's browser stampers (docs/builds/BUILD-FLOFI-AUTH-WALLETS-001.md).
+BUILDAUTHWALLETS001_DIRECT_VERSIONS = {
+    "@turnkey/crypto": "2.13.3",
+    "@turnkey/iframe-stamper": "2.11.1",
+    "@turnkey/indexed-db-stamper": "1.3.12",
+}
 
 # The pre-existing BUILD-001 MPL tooling exception is exact-name scoped too.
 BUILD001_LIGHTNINGCSS_NAMES = {
@@ -444,7 +457,7 @@ def verify_dependencies():
     if lock.count("\npackages:\n") != 1 or lock.count("\nsnapshots:\n") != 1:
         raise RuntimeError("Unrecognized lockfile sections")
     resolved_sections = "packages:\n" + lock.split("\npackages:\n", 1)[1]
-    if hashlib.sha256(resolved_sections.encode()).hexdigest() != "da68e8dfb28b5b3cd95bbe638af3b81083bd8a56d3df02b51a3711e78d8fd261":
+    if hashlib.sha256(resolved_sections.encode()).hexdigest() != "978db9a42627fb6d11316e6496ef8ccd76dc2f92a0e6269a63ba0be5d908b7ac":
         errors.append("Baseline registry packages/snapshots or peer resolutions changed")
     packages_text = lock.split("\npackages:\n", 1)[1].split("\nsnapshots:\n", 1)[0]
     snapshots_text = lock.split("\nsnapshots:\n", 1)[1]
@@ -508,6 +521,7 @@ def verify_dependencies():
         **BUILDMCP001_DIRECT_VERSIONS,
         "@sinclair/typebox": "0.34.52",
         "ajv": "8.20.0",
+        **BUILDAUTHWALLETS001_DIRECT_VERSIONS,
     }
     expected_app_dev = {key: BUILD002_DIRECT_VERSIONS[key] for key in
                         ("@playwright/test", "@types/react", "@types/react-dom")}
@@ -605,6 +619,11 @@ def verify_dependencies():
             errors.append(f"BUILD-MCP-001 direct lock identity missing: {identity}@{version}")
         if not re.search(rf"(?m)^      '{re.escape(identity)}':\n        specifier: {re.escape(version)}\n        version: {re.escape(version)}$", app_importer):
             errors.append(f"BUILD-MCP-001 app lock importer differs: {identity}")
+    for identity, version in BUILDAUTHWALLETS001_DIRECT_VERSIONS.items():
+        if identity + "@" + version not in locked:
+            errors.append(f"BUILD-FLOFI-AUTH-WALLETS-001 direct lock identity missing: {identity}@{version}")
+        if not re.search(rf"(?m)^      '{re.escape(identity)}':\n        specifier: {re.escape(version)}\n        version: {re.escape(version)}$", app_importer):
+            errors.append(f"BUILD-FLOFI-AUTH-WALLETS-001 app lock importer differs: {identity}")
     for manifest_path in [Path("package.json"), *Path("packages").glob("*/package.json"),
                           Path("apps/reference-dapp/package.json")]:
         manifest = json.loads(manifest_path.read_text())
@@ -615,7 +634,8 @@ def verify_dependencies():
                 if (name + "@" + version not in pins and BUILD002_DIRECT_VERSIONS.get(name) != version
                         and BUILD003D_DIRECT_VERSIONS.get(name) != version
                         and BUILDCLOUD001_DIRECT_VERSIONS.get(name) != version
-                        and BUILDMCP001_DIRECT_VERSIONS.get(name) != version):
+                        and BUILDMCP001_DIRECT_VERSIONS.get(name) != version
+                        and BUILDAUTHWALLETS001_DIRECT_VERSIONS.get(name) != version):
                     errors.append(f"Unapproved direct pin: {name}@{version}")
 
     def dependencies(body, group):
@@ -711,9 +731,15 @@ def verify_dependencies():
         license_id = package.get("license")
         legacy_mpl = (license_id == "MPL-2.0" and version == "1.33.0" and
                       name in BUILD001_LIGHTNINGCSS_NAMES)
+        # BlueOak-1.0.0 (permissive, OSI-approved), exact identities only. minimatch@10.2.6 was reviewed earlier; GHSA-g3hv-75wg-m249
+        # moves ESLint's three consumers to minimatch@11.0.3, which adds its author's @isaacs/nonrecursive-glob-match (same license).
         legacy_blueoak = (license_id == "BlueOak-1.0.0" and
                           identity in {"minimatch@11.0.3", "@isaacs/nonrecursive-glob-match@1.0.3"})
-        rejected = license_id not in allowed_licenses and not legacy_mpl and not legacy_blueoak
+        # 0BSD (OSI-approved, public-domain-equivalent: no attribution or notice obligation), exact identity only. tslib@1.14.1 is
+        # tsyringe@4.10.0's TypeScript helper runtime, reached only through @turnkey/crypto@2.13.3 → @peculiar/x509. The existing
+        # tslib@2.8.1 exception is unchanged; no other 0BSD package or version is accepted by this line.
+        reviewed_0bsd = license_id == "0BSD" and identity == "tslib@1.14.1"
+        rejected = license_id not in allowed_licenses and not legacy_mpl and not legacy_blueoak and not reviewed_0bsd
         approved = BUILD002_REVIEWED_LICENSE_EXCEPTIONS.get(identity)
         if approved:
             if (license_id != approved["license"] or integrity != approved["integrity"]):

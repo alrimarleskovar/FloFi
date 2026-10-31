@@ -18,10 +18,11 @@ describe('BUILD-CLOUD-001 backend entry point loads under plain Node', () => {
     // BUILD-RH-002 adds the Robinhood Chain swap, mainnet transfer, liquidity and the four Robinhood bridge routes; BUILD-BASE-001 the Base
     // mainnet swap, transfer, liquidity and Aave flows and the Router's Arbitrum One → Base route; the Solana Devnet Swap → Orca liquidity composition;
     // BUILD-SOLANA-MAINNET-001 Orca liquidity on Solana mainnet-beta; BUILD-SOLANA-TRANSFER-UX-001 the direct Solana and Solana Devnet transfers;
-    // BUILD-CROSSCHAIN-UNIVERSAL-001 the universal Cross-chain Router.
+    // BUILD-CROSSCHAIN-UNIVERSAL-001 the universal Cross-chain Router; BUILD-FLOFI-AUTH-WALLETS-001 FloFi Wallet's EVM reads and attempt-bound
+    // broadcast (`managed-wallet-evm`, no runs of its own).
     expect(stdout.trim()).toBe('aave-supply,arbitrum-aave,arbitrum-liquidity,arbitrum-mainnet-transfer,arbitrum-swap,base-aave,base-liquidity,base-mainnet-transfer,base-sepolia-swap,base-swap,crosschain-router,crosschain-router-arbitrum-to-base,crosschain-router-arbitrum-to-ethereum,' +
       'crosschain-router-arbitrum-to-robinhood,crosschain-router-base-to-ethereum,crosschain-router-base-to-robinhood,crosschain-router-ethereum-to-arbitrum,crosschain-router-ethereum-to-base,crosschain-router-ethereum-to-robinhood,' +
-      'crosschain-router-robinhood-to-arbitrum,crosschain-router-robinhood-to-base,crosschain-router-robinhood-to-ethereum,crosschain-router-testnet,crosschain-universal,ethereum-aave,ethereum-liquidity,ethereum-mainnet-transfer,ethereum-swap,jupiter-swap,lending-composition,orca-liquidity,orca-liquidity-mainnet,pix-payment,' +
+      'crosschain-router-robinhood-to-arbitrum,crosschain-router-robinhood-to-base,crosschain-router-robinhood-to-ethereum,crosschain-router-testnet,crosschain-universal,ethereum-aave,ethereum-liquidity,ethereum-mainnet-transfer,ethereum-swap,jupiter-swap,lending-composition,managed-wallet-evm,orca-liquidity,orca-liquidity-mainnet,pix-payment,' +
       'robinhood-liquidity,robinhood-mainnet-transfer,robinhood-swap,robinhood-transfer,solana-devnet-composition,solana-devnet-swap,solana-devnet-transfer,solana-transfer,uniswap-liquidity');
   });
   it('refuses to start without configuration instead of running unconfigured', async () => {

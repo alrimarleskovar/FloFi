@@ -11,6 +11,8 @@ import { solanaTransferBegin, solanaTransferInfo, solanaTransferInvalidate, sola
 import { solanaTransferDetails } from '../domain/solana-transfer-authoring';
 import type { SolanaNetwork } from '../domain/jupiter-authoring';
 import type { SolanaTransferRecord } from '../server/solana-transfer-service';
+import { bindFloFiSigning } from '../wallet/flofi-wallet-channel';
+import { signingContextOf } from '../wallet/flofi-signing';
 
 /**
  * BUILD-SOLANA-TRANSFER-UX-001: the Solana transfer runtime in the browser. It signs with the product's one Solana wallet session (the shared
@@ -116,6 +118,8 @@ export function SolanaTransferProvider({ children }: { children: ReactNode }) {
       if (begin.value.walletChain !== current.chain) throw new Error(`${X}_WRONG_CLUSTER`);
       if (JSON.stringify(latest.current) !== JSON.stringify(snapshot)) throw new Error(`${X}_SEMANTIC_REVISION_CHANGED`);
       // The sole owner-signature request, reachable only from the owner's Authorize action.
+      // BUILD-FLOFI-AUTH-WALLETS-001: FloFi Wallet signs only for the reviewed run it is told about (no effect on any other wallet).
+      bindFloFiSigning(current.wallet, signingContextOf(record.id, 'solana-transfer'));
       signed = await signWithSolanaWallet(current, begin.value.unsignedTransaction, X, () => {
         if (latestSession.current !== current) throw new Error(`${X}_WALLET_CHANGED`);
         if (JSON.stringify(latest.current) !== JSON.stringify(snapshot)) throw new Error(`${X}_SEMANTIC_REVISION_CHANGED`);

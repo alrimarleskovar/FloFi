@@ -9,6 +9,8 @@ import { initialEditor } from '../domain/editor';
 import { deferred, HookHarness } from '../test-utils/hook-harness';
 import { reviewFixture } from '../test-utils/review-fixture';
 import { composeStrategy } from '../engine/strategy-engine';
+import { floFiRefusal, rejected } from './public-testnet-store';
+import { FloFiProviderError } from '../wallet/flofi-evm-provider';
 
 vi.mock('react', async original => ({ ...await original<typeof import('react')>(), ...(await import('../test-utils/hook-harness')).hookMocks }));
 const f = vi.hoisted(() => ({ workflow: null as Workflow | null, restore: vi.fn(), session: vi.fn() }));
@@ -88,5 +90,20 @@ describe('public swap durable recovery and explicit fresh Review', () => {
     read(); await settle(); store.simulate(); await settle();
     expect(store.error).toContain('transaction is already in progress');
     expect(publicPrepare).not.toHaveBeenCalled(); expect(publicRefresh).not.toHaveBeenCalled(); expect(publicBegin).not.toHaveBeenCalled();
+  });
+});
+
+describe('wallet outcomes (BUILD-FLOFI-AUTH-WALLETS-001)', () => {
+  it('treats a FloFi Wallet refusal proven before any signature as a rejection, and everything else unclear as unknown', () => {
+    for (const code of ['FLOFI_WALLET_REVIEW_EXPIRED', 'FLOFI_WALLET_NONCE_MISMATCH', 'FLOFI_WALLET_FEE_TOO_HIGH', 'FLOFI_WALLET_NO_MATCHING_REVIEW']) {
+      expect(floFiRefusal(new FloFiProviderError(4100, code))).toBe(code);
+      expect(rejected(new FloFiProviderError(4100, code))).toBe(true);
+    }
+    expect(rejected({ code: 4001 })).toBe(true);
+    // Not proven before signing: a 4100 with another code, an already-signed attempt, or a plain failure after FloFi Wallet may have signed.
+    expect(rejected(new FloFiProviderError(4100, 'SOMETHING_ELSE'))).toBe(false);
+    expect(rejected(new FloFiProviderError(4100, 'FLOFI_WALLET_ALREADY_SIGNED'))).toBe(false);
+    expect(rejected(new Error('FLOFI_WALLET_SUBMISSION_UNKNOWN'))).toBe(false);
+    expect(rejected({ code: 4100 })).toBe(false);
   });
 });

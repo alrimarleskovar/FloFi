@@ -42,7 +42,7 @@ for (const width of [390, 768, 1440, 1920]) {
         ? 'A trade, a bridge, a lending strategy. The direction is one clear workflow across your crypto, with FloFi as an execution layer behind wallets, dapps and intelligent agents. Broader coverage remains on the roadmap.'
         : 'Uma troca, um bridge, uma estratégia de empréstimo. A direção é um fluxo claro entre seus ativos, com FloFi como camada de execução por trás de carteiras, dapps e agentes inteligentes. A cobertura mais ampla continua no roadmap.');
       await expect(closing).toContainText(locale === 'en' ? 'From financial intent to verifiable onchain execution.' : 'Da intenção financeira à execução onchain verificável.');
-      await expect(closing.getByRole('link', { name: locale === 'en' ? 'Launch FloFi' : 'Abrir FloFi' })).toHaveAttribute('href', '/app');
+      await expect(closing.getByRole('link', { name: locale === 'en' ? 'Launch FloFi' : 'Abrir FloFi' })).toHaveAttribute('href', '/login');
       await expect(closing.getByRole('link', { name: locale === 'en' ? 'Build with FloFi' : 'Construir com FloFi' })).toHaveAttribute('href', '/docs/developer-api');
       const diagram = closing.locator('[data-flow-diagram="dark"]');
       await expect.poll(async () => { try { await assertConnectedFlow(diagram, 1); return true; } catch { return false; } }).toBe(true);
@@ -229,7 +229,7 @@ for (const width of [390, 1440]) {
   test(`closing CTAs open the product and native developer API at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.addInitScript(() => sessionStorage.setItem('flofi-alive-intro-v1', 'seen'));
-    for (const [label, destination] of [['Launch FloFi', '/app'], ['Build with FloFi', '/docs/developer-api']] as const) {
+    for (const [label, destination] of [['Launch FloFi', '/login'], ['Build with FloFi', '/docs/developer-api']] as const) {
       await page.goto('/');
       const link = page.locator('#about').getByRole('link', { name: label, exact: true });
       await link.scrollIntoViewIfNeeded();
@@ -240,7 +240,7 @@ for (const width of [390, 1440]) {
       })).toBe(true);
       await link.click();
       await expect(page).toHaveURL(new RegExp(`${destination}$`));
-      await expect(page.locator(destination === '/app' ? '.app-shell' : '#docs-content')).toBeVisible();
+      await expect(page.locator(destination === '/login' ? 'h1' : '#docs-content')).toBeVisible();
     }
   });
 }

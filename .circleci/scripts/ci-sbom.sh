@@ -13,7 +13,7 @@ try:
         raise SystemExit('Unexpected SBOM format or version')
     evidence=json.loads((path.parent/'build-002-dependencies.json').read_text())
     expected={(r['name'],r['version']):r['license'] for r in evidence}
-    if len(evidence)!=264 or len(expected)!=264:
+    if len(evidence)!=295 or len(expected)!=295:
         raise SystemExit('Dependency evidence count changed')
     components=document.get('components')
     if not isinstance(components,list):
@@ -63,7 +63,7 @@ try:
     if importer_paths!={'.','packages/workflow-contracts','packages/action-registry','packages/reference-linter','packages/reference-compiler','packages/reference-executor','packages/reference-reconciler','packages/cloud-runtime','packages/developer-sdk','apps/reference-dapp'}:
         raise SystemExit('Workspace lock importer inventory differs')
     component_refs={component['bom-ref'] for component in components}
-    if len(component_refs)!=264 or root_component.get('bom-ref') in component_refs:
+    if len(component_refs)!=295 or root_component.get('bom-ref') in component_refs:
         raise SystemExit('SBOM component references differ')
     dependencies=document.get('dependencies')
     if not isinstance(dependencies,list):
@@ -101,7 +101,7 @@ try:
         actual=license_value.get('expression',license_value.get('license',{}).get('id'))
         if actual!=expected[(name,component['version'])]:
             raise SystemExit('SBOM license expression changed: '+name)
-    message='Ephemeral CycloneDX 1.6 SBOM: 264 exact registry components, zero workspace components (ten exact manifests and importers checked separately), 16 reviewed exceptions with actual licenses, SHA-256 '+hashlib.sha256(raw).hexdigest()
+    message='Ephemeral CycloneDX 1.6 SBOM: 295 exact registry components, zero workspace components (ten exact manifests and importers checked separately), 16 reviewed exceptions with actual licenses, SHA-256 '+hashlib.sha256(raw).hexdigest()
     print(message)
     with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8') as summary:
         summary.write(message+'\n')

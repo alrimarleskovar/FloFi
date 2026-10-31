@@ -26,6 +26,8 @@ import { activeNetworkScope } from '../domain/network-scope';
 import { solanaWalletErrorMessage } from '../wallet/wallet-errors';
 
 export type Namespace = 'eip155' | 'solana';
+/** One proof attempt: the account the server verified (null when cancelled or failed), the error code, and the wallet chosen. */
+export type ProofOutcome = { readonly account: string | null; readonly error: string | null; readonly wallet: { readonly key: string; readonly name: string } | null };
 /** BUILD-CHAT-LEARNING-002: dispatched on `window` when the proven wallet or a Privacy & memory choice changed. */
 export const LEARNING_CHANGED = 'flofi:learning-changed';
 /**
@@ -55,6 +57,10 @@ export function useWalletProof(namespace: Namespace | null, chain: SolanaWalletC
   const [proven, setProven] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** BUILD-FLOFI-AUTH-WALLETS-001: the wallet the owner chose for the last proof (display metadata only, never an identity). */
+  const [wallet, setWalletState] = useState<{ readonly key: string; readonly name: string } | null>(null);
+  const walletRef = useRef<{ readonly key: string; readonly name: string } | null>(null);
+  const setWallet = (value: { readonly key: string; readonly name: string }) => { walletRef.current = value; setWalletState(value); };
   const requestLock = useRef(false), namespaceRef = useRef(namespace); namespaceRef.current = namespace;
   const origin = useRef<object>({});
   const embedded = typeof window !== 'undefined' && window.location?.pathname === '/mcp/approve';
@@ -73,9 +79,14 @@ export function useWalletProof(namespace: Namespace | null, chain: SolanaWalletC
     window.addEventListener(WALLET_PROOF_CHANGED, changed);
     return () => window.removeEventListener(WALLET_PROOF_CHANGED, changed);
   }, [namespace, refresh]);
-  async function run(action: () => Promise<string | null>) {
-    if (requestLock.current) return; requestLock.current = true; setBusy(true); setError(null);
+  /**
+   * BUILD-FLOFI-AUTH-WALLETS-001: resolves with this attempt's outcome (the proven account, or the error / null when the owner closed the
+   * chooser), so a caller acts on exactly this proof and never on an earlier session. Existing callers ignore the value.
+   */
+  async function run(action: () => Promise<string | null>): Promise<ProofOutcome> {
+    if (requestLock.current) return { account: null, error: null, wallet: null }; requestLock.current = true; setBusy(true); setError(null);
     const requestedNamespace = namespace;
+    walletRef.current = null;
     try {
       const account = await action();
       // BUILD-CHAT-LEARNING-002: a newly proven wallet changes whose Copilot memory applies; the Copilot reloads its learning context.
@@ -83,7 +94,12 @@ export function useWalletProof(namespace: Namespace | null, chain: SolanaWalletC
         setProven(account); window.dispatchEvent(new Event(LEARNING_CHANGED));
         window.dispatchEvent(new CustomEvent(WALLET_PROOF_CHANGED, { detail: { namespace: requestedNamespace, origin: origin.current } }));
       }
-    } catch (cause) { if (namespaceRef.current === requestedNamespace) setError(codeOf(cause)); } finally { requestLock.current = false; setBusy(false); }
+      return { account, error: null, wallet: account ? walletRef.current : null };
+    } catch (cause) {
+      const code = codeOf(cause);
+      if (namespaceRef.current === requestedNamespace) setError(code);
+      return { account: null, error: code, wallet: null };
+    } finally { requestLock.current = false; setBusy(false); }
   }
   /** `another`: the owner asked to prove a different wallet, so the selector opens even when one is connected. */
   const proveEvm = (another = false) => run(async () => {
@@ -91,6 +107,7 @@ export function useWalletProof(namespace: Namespace | null, chain: SolanaWalletC
     if (!account) {
       const choice = await selector.choose({ ecosystems: ['evm'], title: 'Choose a wallet to prove ownership' });
       if (!choice) return null;
+      setWallet({ key: choice.key, name: choice.name });
       if (evm) account = (await evm.connectWith(choice.id))?.account ?? null;
       else {
         provider = chooseEvmWallet(choice.id); if (!provider) throw new Error('EVM_WALLET_NOT_FOUND');
@@ -98,6 +115,7 @@ export function useWalletProof(namespace: Namespace | null, chain: SolanaWalletC
         account = Array.isArray(accounts) && typeof accounts[0] === 'string' ? accounts[0].toLowerCase() : null;
       }
     }
+    else if (evm?.provider) setWallet({ key: evm.provider.key, name: evm.provider.name });
     provider ??= injected();
     if (!account || !provider) throw new Error('EVM_WALLET_NOT_FOUND');
     const chainId = await provider.request({ method: 'eth_chainId' });
@@ -119,10 +137,11 @@ export function useWalletProof(namespace: Namespace | null, chain: SolanaWalletC
     if (!session) {
       const choice = await selector.choose({ ecosystems: ['solana'], solanaChain: chain, title: 'Choose a Solana wallet to prove ownership' });
       if (!choice) return null;
+      setWallet({ key: choice.key, name: choice.name });
       if (solana) session = await solana.connectWith(choice.key, chain);
       else { session = await connectSolanaWallet(choice.key, chain, 'WALLET'); updateWalletPreference({ solana: choice.key }); }
       if (!session) throw new Error('SOLANA_WALLET_REQUIRED');
-    }
+    } else setWallet({ key: session.wallet.name, name: session.wallet.name });
     const { message } = unwrap(await solanaSignInChallenge(session.account.address, ...proofContext));
     const signature = await signSolanaMessage(session, message, 'WALLET');
     const verified = unwrap(await solanaSignIn(session.account.address, signature, ...proofContext));
@@ -131,7 +150,7 @@ export function useWalletProof(namespace: Namespace | null, chain: SolanaWalletC
   });
   /** The connected operational account of this namespace, if any (connection only: never treated as proof). */
   const connected = namespace === 'solana' ? solana?.session?.chain === chain ? solana.session.account.address : null : namespace === 'eip155' ? evm?.account ?? null : null;
-  return { proven, busy, error, connected, proveEvm, proveSolana, refresh };
+  return { proven, busy, error, connected, wallet, proveEvm, proveSolana, refresh };
 }
 
 /** The proof buttons for one namespace, or the proven account. */

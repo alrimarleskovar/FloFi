@@ -116,7 +116,7 @@ export default function LandingPage() {
     <header className={styles.siteHeader}><div className={styles.headerInner}>
       <a href="/" className={styles.brandLink} aria-label={t.brandHome}><Brand /></a>
       <nav aria-label={t.mainNavigation}><a href="#workflow">{t.navProduct}</a><a href="#networks">{t.navNetworks}</a><a href="#developers">{t.navDevelopers}</a><a href="/docs">{t.navDocs}</a></nav>
-      <div className={styles.headerActions}><div className={styles.languageSwitch} role="group" aria-label={t.language}><button type="button" lang="pt-BR" aria-pressed={locale === 'pt'} onClick={() => changeLocale('pt')}>PT</button><span aria-hidden="true">/</span><button type="button" lang="en" aria-pressed={locale === 'en'} onClick={() => changeLocale('en')}>EN</button></div><a className={styles.headerCta} href="/app">{t.headerLaunch} <Arrow /></a></div>
+      <div className={styles.headerActions}><div className={styles.languageSwitch} role="group" aria-label={t.language}><button type="button" lang="pt-BR" aria-pressed={locale === 'pt'} onClick={() => changeLocale('pt')}>PT</button><span aria-hidden="true">/</span><button type="button" lang="en" aria-pressed={locale === 'en'} onClick={() => changeLocale('en')}>EN</button></div><a className={styles.headerCta} href="/login">{t.headerLaunch} <Arrow /></a></div>
     </div></header>
 
     <main id="main" tabIndex={-1}>
@@ -132,11 +132,11 @@ export default function LandingPage() {
         <div className={styles.developerStatement}><strong>{t.oneIntegration}</strong><span>{t.partnerBody}</span></div>
         <div className={styles.developerValues}><div><strong>{t.uxYours}</strong><span>{t.uxYoursBody}</span></div><div><strong>{t.executionStructured}</strong><span>{t.executionStructuredBody}</span></div><div><strong>{t.outcomesInspectable}</strong><span>{t.outcomesInspectableBody}</span></div></div>
         <a className={styles.primaryButton} href="/docs/developer-api">{t.buildWith} <Arrow /></a>
-        <div id="documentation" className={styles.documentation}><strong><a href="/docs">{t.developerDocs} <Arrow /></a></strong><span>{t.developerDocsBody}</span><a href="/app">{t.openBuilder} <Arrow /></a></div>
+        <div id="documentation" className={styles.documentation}><strong><a href="/docs">{t.developerDocs} <Arrow /></a></strong><span>{t.developerDocsBody}</span><a href="/login">{t.openBuilder} <Arrow /></a></div>
       </div></section>
 
       <section className={styles.closingSection} id="about" aria-labelledby="vision-title" data-landing-reveal><EarthAtmosphere/><div className={styles.container}><div className={styles.closingGrid}>
-        <div><SectionKicker>{t.visionEyebrow}</SectionKicker><h2 id="vision-title">{t.visionTitleFirst}<br /><span>{t.visionTitleSecond}</span></h2><p>{t.visionBody}</p><MascotDock scene="cta" white/><div className={styles.heroActions}><a className={styles.primaryButton} href="/app" data-mascot-cta>{t.launch} <Arrow /></a><a className={styles.darkSecondaryButton} href="/docs/developer-api">{t.buildWith}</a></div><p className={styles.closingFootnote}>{t.visionFootnote}</p></div>
+        <div><SectionKicker>{t.visionEyebrow}</SectionKicker><h2 id="vision-title">{t.visionTitleFirst}<br /><span>{t.visionTitleSecond}</span></h2><p>{t.visionBody}</p><MascotDock scene="cta" white/><div className={styles.heroActions}><a className={styles.primaryButton} href="/login" data-mascot-cta>{t.launch} <Arrow /></a><a className={styles.darkSecondaryButton} href="/docs/developer-api">{t.buildWith}</a></div><p className={styles.closingFootnote}>{t.visionFootnote}</p></div>
         <VisionVisual t={t} />
       </div></div></section>
     </main>

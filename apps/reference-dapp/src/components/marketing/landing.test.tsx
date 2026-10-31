@@ -79,7 +79,7 @@ describe('BUILD-FLOFI-UX-UI-002 landing', () => {
       expect(html.match(/<button /g)).toHaveLength(1);
       expect(html).toMatch(/<button [^>]*hidden=""/);
       expect(html.match(/<a /g)).toHaveLength(1);
-      expect(html).toContain('href="/app"');
+      expect(html).toContain('href="/login"');
       const text = plain(html);
       for (const key of ['demoEyebrow', 'demoTitle', 'demoBody', 'demoIllustration', 'demoNote', 'demoCta'] as const) expect(text).toContain(t[key]);
       // Server HTML is the complete final frame: both cards, every message, Simulate and Execute.

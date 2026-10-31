@@ -44,7 +44,7 @@ export function WorkflowStory({ t, locale = 'en' }: { t: LandingCopy; locale?: L
           <p>{t.storyBody}</p>
           <div className={styles.heroCtaRow}>
             <div className={styles.heroActions}>
-              <a className={styles.primaryButton} href="/app" data-mascot-cta>{t.launch} <span aria-hidden="true">→</span></a>
+              <a className={styles.primaryButton} href="/login" data-mascot-cta>{t.launch} <span aria-hidden="true">→</span></a>
               <a className={styles.secondaryButton} href="/docs">{t.exploreDocs} <span aria-hidden="true">→</span></a>
             </div>
             <SocialLinks t={t} variant="hero"/>

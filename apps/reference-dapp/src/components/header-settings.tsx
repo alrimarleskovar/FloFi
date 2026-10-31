@@ -5,6 +5,7 @@ import { useLocale } from '../i18n/locale';
 import { useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
 import { learningAvailability } from '../app/learning-action';
+import { accountSignOut, accountState, type AccountState } from '../app/account-action';
 
 export function HeaderSettings({ onDisconnect, disconnectDisabled, onSupport }: { onDisconnect: () => void; disconnectDisabled: boolean; onSupport?: () => void }) {
   const { t: tr } = useLocale();
@@ -18,11 +19,19 @@ export function HeaderSettings({ onDisconnect, disconnectDisabled, onSupport }: 
   const menuId = useId();
   // BUILD-CHAT-LEARNING-002: Privacy & memory is listed only where the deployment keeps learning data (checked when the menu first opens).
   const [privacy, setPrivacy] = useState(false), checked = useRef(false);
+  // BUILD-FLOFI-AUTH-WALLETS-001: the FloFi account entry, only where this deployment offers accounts (read when the menu first opens).
+  const [account, setAccount] = useState<AccountState | null>(null);
   useEffect(() => {
     if (!open || checked.current) return;
     checked.current = true;
     void learningAvailability().then(tier => setPrivacy(tier === 'ENABLED'), () => undefined);
+    // Not inside the embedded MCP approval: signing in there would navigate away from the approval.
+    if (window.location.pathname !== '/mcp/approve') void accountState().then(setAccount, () => undefined);
   }, [open]);
+  async function signOut() {
+    await accountSignOut().catch(() => undefined);
+    window.location.assign('/login');
+  }
   const languageDescriptionId = useId(), themeDescriptionId = useId();
   useEffect(() => {
     let saved: 'light' | 'dark' = 'light';
@@ -91,6 +100,15 @@ export function HeaderSettings({ onDisconnect, disconnectDisabled, onSupport }: 
         <span id={themeDescriptionId} className="sr-only">{tr("Current theme: ")}{tr(theme === 'dark' ? 'Dark' : 'Light')}</span>
       </div>
       <hr className="header-settings-separator"/>
+      {account?.availability.accounts && (account.account ? <>
+        <Link href="/app/credentials" className="header-settings-action" onClick={() => setOpen(false)}>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>{tr("My account")}</span>
+        </Link>
+        <button type="button" className="header-settings-action" onClick={() => void signOut()}>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5M10 12H3m4-4-4 4 4 4"/></svg><span>{tr("Sign out")}</span>
+        </button></> : /* A full page load: sign-in runs under its own nonce policy (src/accounts/account-csp.ts), never this page's. */ <a href="/login" className="header-settings-action" onClick={() => setOpen(false)}>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>{tr("Sign in")}</span>
+        </a>)}
       {privacy && <Link href="/app/privacy" className="header-settings-action" onClick={() => setOpen(false)}>
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6Z"/><path d="m9 12 2 2 4-4"/></svg><span>{tr("Privacy & memory")}</span>
       </Link>}

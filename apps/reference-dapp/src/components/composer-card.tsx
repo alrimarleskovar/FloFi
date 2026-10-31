@@ -23,6 +23,7 @@ import { SolanaVerifiedAssetSearch } from './solana-verified-asset-search';
 import { universalKeyOfCanvasLabel } from '../domain/universal-bridge-authoring';
 import { UNIVERSAL_NETWORKS } from '@defi-workflow-engine/workflow-contracts';
 import { AssetSearch } from './asset-search';
+import { useRevealPanel } from './canvas-panel-reveal';
 import { ProposalReviewArtifact } from './proposal-review';
 import { usdLine, type UsdLine } from '../domain/usd-estimate';
 
@@ -141,7 +142,9 @@ function AssetNetworkPicker({ id, side, symbol, network, tokens, networks, unava
   const { t: tr } = useLocale();
   const sideLabel = side === 'source' ? 'Source' : 'Destination';
   const shortcuts = <TokenPicker symbol={symbol} network={network} options={tokens} onChange={token => { if (tokens.includes(token)) onTokenChange(token); }}/>;
-  return <section id={id} className="composer-stocks-panel composer-bridge-picker nodrag nopan" aria-label={tr(`${sideLabel} ${bridge ? 'bridge' : 'asset'} picker`)}
+  const panel = useRef<HTMLElement>(null);
+  useRevealPanel(panel);
+  return <section ref={panel} id={id} className="composer-stocks-panel composer-bridge-picker nodrag nopan" aria-label={tr(`${sideLabel} ${bridge ? 'bridge' : 'asset'} picker`)}
     onClick={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()} onKeyDownCapture={event => {
       if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); onCollapse(); }
     }}>
@@ -204,7 +207,9 @@ function StockPicker({ equity, options, onChange }: { equity: string; options: r
  */
 function StocksPanel({ id, equity, onChange, onCollapse }: { id: string; equity: string; onChange(equity: string): void; onCollapse(): void }) {
   const { t: tr } = useLocale();
-  return <section id={id} className="composer-stocks-panel composer-stocks-catalog nodrag nopan" aria-label={tr("Stocks configuration")} onClick={event => event.stopPropagation()}
+  const panel = useRef<HTMLElement>(null);
+  useRevealPanel(panel);
+  return <section ref={panel} id={id} className="composer-stocks-panel composer-stocks-catalog nodrag nopan" aria-label={tr("Stocks configuration")} onClick={event => event.stopPropagation()}
     onKeyDown={event => event.stopPropagation()} onKeyDownCapture={event => { if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); onCollapse(); } }}>
     <button type="button" className="composer-pool-collapse" aria-label={tr("Hide Stocks configuration")} title={tr("Hide Stocks configuration")} onClick={onCollapse}>
       <svg viewBox="0 0 20 20" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="m8 5-5 5 5 5m9-10-5 5 5 5"/></svg>
@@ -263,7 +268,9 @@ function PoolRangeSelector({ mode, onChange }: { mode: 'Tick' | 'Price'; onChang
 function PoolPricePanel({ strategy, onSelect, onCollapse }: { strategy: PoolPricePreset | null; onSelect(strategy: PoolPricePreset): void; onCollapse(): void }) {
   const { t: tr } = useLocale();
   const id = useId();
-  return <fieldset className="composer-pool-presets nodrag nopan" onClick={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
+  const panel = useRef<HTMLFieldSetElement>(null);
+  useRevealPanel(panel);
+  return <fieldset ref={panel} className="composer-pool-presets nodrag nopan" onClick={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
       <legend className="sr-only">{tr("Price strategies")}</legend>
       <button type="button" className="composer-pool-collapse" aria-label={tr("Hide price strategies")} title={tr("Hide price strategies")} onClick={onCollapse}>
         <svg viewBox="0 0 20 20" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m8 5-5 5 5 5m9-10-5 5 5 5"/></svg>

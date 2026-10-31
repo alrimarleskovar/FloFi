@@ -68,6 +68,11 @@ for (const width of widths) {
     await page.getByRole('button', { name: 'EN', exact: true }).click();
     await expect(page.getByRole('link', { name: 'Launch Beta FloFi', exact: true })).toBeVisible();
     await page.getByRole('link', { name: 'Launch Beta FloFi', exact: true }).click();
+    // BUILD-FLOFI-AUTH-WALLETS-001: the landing opens sign-in first; the builder stays reachable without an account.
+    await expect(page).toHaveURL('/login');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await noOverflow(page);
+    await page.getByRole('link', { name: 'Explore the builder without an account', exact: true }).click();
     await expect(page).toHaveURL('/app');
     await expect(page.getByRole('navigation', { name: 'Workflow stages' })).toBeVisible();
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');

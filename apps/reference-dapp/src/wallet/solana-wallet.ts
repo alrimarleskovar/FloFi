@@ -26,12 +26,15 @@ function register(...wallets: StandardWallet[]) {
     for (const listener of registrationListeners) listener();
   };
 }
+const reservedWalletName = (name: unknown) => typeof name === 'string' && /^\s*flofi\s*wallet\b/i.test(name);
 /** Wallet Standard app-ready / register-wallet handshake without an extra dependency. */
 function registeredWallets(): StandardWallet[] {
   if (typeof window === 'undefined') return [];
   if (!listening) {
     listening = true;
-    const api = Object.freeze({ register });
+    // BUILD-FLOFI-AUTH-WALLETS-001: the name "FloFi Wallet" belongs to FloFi's own wallet, which registers directly (registerSolanaWallet);
+    // a page script or extension announcing that name is ignored rather than shown next to it.
+    const api = Object.freeze({ register: (...wallets: StandardWallet[]) => register(...wallets.filter(wallet => !reservedWalletName(wallet?.name))) });
     window.addEventListener('wallet-standard:register-wallet', event => {
       const callback = (event as CustomEvent<unknown>).detail;
       if (typeof callback === 'function') callback(api);
@@ -39,6 +42,15 @@ function registeredWallets(): StandardWallet[] {
     window.dispatchEvent(new CustomEvent('wallet-standard:app-ready', { detail: api }));
   }
   return registered;
+}
+/**
+ * BUILD-FLOFI-AUTH-WALLETS-001: registers a wallet FloFi itself provides (FloFi Wallet, `flofi-solana-wallet.ts`) directly, without the
+ * global Wallet Standard event any page script could also answer. It joins the same registry as extension wallets (selection stays explicit
+ * by name; identity stays the object) and the returned function unregisters it, which retires every session that used it.
+ */
+export function registerSolanaWallet(wallet: StandardWallet): () => void {
+  registeredWallets();
+  return register(wallet);
 }
 export function solanaWallets(chain: SolanaWalletChain = SOLANA_WALLET_CHAIN): StandardWallet[] {
   return registeredWallets().filter(wallet => Array.isArray(wallet.chains) && wallet.chains.includes(chain) &&

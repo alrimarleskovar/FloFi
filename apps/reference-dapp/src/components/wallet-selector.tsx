@@ -5,12 +5,18 @@
  * open it. It lists the wallets this browser exposes (with their ecosystem) and resolves with the owner's choice. It never
  * talks to a wallet: opening, browsing, Escape and clicking outside cannot invoke a provider. The caller connects only
  * the chosen wallet after this resolves.
+ *
+ * BUILD-FLOFI-AUTH-WALLETS-001: when the signed-in FloFi account holds managed wallets, FloFi Wallet is listed next to the detected wallets
+ * (one entry per address, with its lock state) and the provider keeps those entries in step with the account. Choosing it is as explicit as
+ * choosing any other wallet. The provider also mounts the "Continue in FloFi Wallet" prompt. Never inside an embedding frame.
  */
 import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { evmWalletEntries, incompatibleWalletMessage, requestEvmAnnouncements, subscribeEvmDiscovery } from '../wallet/evm-discovery';
 import { solanaWalletChoices, subscribeSolanaDiscovery, type SolanaWalletChain } from '../wallet/solana-wallet';
 import { useLocale } from '../i18n/locale';
 import { ECOSYSTEM_LABEL, orderWalletChoices, undetectedWallets, walletPreference, WALLET_ECOSYSTEMS, type WalletChoice, type WalletEcosystem } from '../wallet/wallet-registry';
+import { isFloFiWalletChoice, syncFloFiWallets } from '../wallet/flofi-wallet-sync';
+import { FloFiWalletContinue, useFloFiWallet } from './flofi-wallet-continue';
 
 export type WalletSelectorRequest = { readonly ecosystems?: readonly WalletEcosystem[]; readonly title?: string;
   /** The Solana cluster the caller will connect on; only wallets that can connect and sign there are offered. */
@@ -45,8 +51,17 @@ export function WalletSelectorProvider({ children, embedded = false }: { childre
     setPending(next);
   }), []);
   useEffect(() => () => { current.current?.resolve(null); current.current = null; }, []);
+  // FloFi Wallet entries follow the account (sign-in, new or removed managed wallets); refreshed when the page becomes visible again.
+  useEffect(() => {
+    if (embedded) return;
+    void syncFloFiWallets({ force: true });
+    const refresh = () => { if (document.visibilityState === 'visible') void syncFloFiWallets(); };
+    document.addEventListener('visibilitychange', refresh); window.addEventListener('focus', refresh);
+    return () => { document.removeEventListener('visibilitychange', refresh); window.removeEventListener('focus', refresh); };
+  }, [embedded]);
   const value = useMemo(() => ({ choose, open: pending !== null }), [choose, pending]);
-  return <Context.Provider value={value}>{children}{pending && <WalletSelectorDialog request={pending} embedded={embedded} onSettle={settle}/>}</Context.Provider>;
+  return <Context.Provider value={value}>{children}{pending && <WalletSelectorDialog request={pending} embedded={embedded} onSettle={settle}/>}
+    {!embedded && <FloFiWalletContinue/>}</Context.Provider>;
 }
 export function useWalletSelector(): Selector {
   const value = useContext(Context);
@@ -72,6 +87,9 @@ function WalletSelectorDialog({ request, onSettle, embedded }: { request: Pendin
   const [detected, setDetected] = useState<WalletChoice[]>(() => detectedWalletChoices(request.ecosystems, request.solanaChain));
   const [incompatible, setIncompatible] = useState<string | null>(null);
   const remembered = walletPreference();
+  const floFi = useFloFiWallet();
+  /** FloFi Wallet's state as the selector shows it: unlocked or locked when its window reported it, else that it opens on Authorize. */
+  const floFiStatus = floFi.lock === 'unlocked' ? 'Unlocked' : floFi.lock === 'locked' ? 'Locked' : 'Opens on Authorize';
   useEffect(() => {
     const refresh = () => {
       setDetected(previous => {
@@ -82,11 +100,12 @@ function WalletSelectorDialog({ request, onSettle, embedded }: { request: Pendin
     };
     refresh();
     requestEvmAnnouncements();
+    if (!embedded) void syncFloFiWallets();
     const stopEvm = subscribeEvmDiscovery(refresh), stopSolana = subscribeSolanaDiscovery(refresh);
     // A legacy window.ethereum can appear without any event; a slow poll keeps the list truthful while open.
     const timer = window.setInterval(refresh, 1000);
     return () => { stopEvm(); stopSolana(); window.clearInterval(timer); };
-  }, [request.ecosystems, request.solanaChain]);
+  }, [request.ecosystems, request.solanaChain, embedded]);
   useEffect(() => {
     const element = dialog.current;
     if (!element) return;
@@ -123,14 +142,15 @@ function WalletSelectorDialog({ request, onSettle, embedded }: { request: Pendin
       <section aria-labelledby={detectedId}>
         <h3 id={detectedId} className="wallet-selector-group">{tr("Detected")}</h3>
         {detected.length ? <ul ref={list} className="wallet-selector-list" onKeyDown={move}>
-          {detected.map(choice => <li key={choice.id}>
-            <button type="button" className="wallet-option" data-wallet-option="" data-ecosystem={choice.ecosystem}
-              aria-label={tr('{0} on {1}', choice.name, ECOSYSTEM_LABEL[choice.ecosystem])} onClick={() => onSettle(choice)}>
+          {detected.map(choice => { const managed = isFloFiWalletChoice(choice); return <li key={choice.id}>
+            <button type="button" className="wallet-option" data-wallet-option="" data-ecosystem={choice.ecosystem} data-flofi-wallet={managed ? floFi.lock : undefined}
+              aria-label={tr('{0} on {1}', choice.name, ECOSYSTEM_LABEL[choice.ecosystem])}
+              aria-description={managed ? tr('Your FloFi account wallet. You confirm every signature in the FloFi Wallet window.') : undefined} onClick={() => onSettle(choice)}>
               <WalletMark icon={choice.icon}/>
               <span className="wallet-option-text"><strong>{choice.name}</strong><small>{ECOSYSTEM_LABEL[choice.ecosystem]}</small></span>
-              <span className="wallet-option-status">{tr(remembered[choice.ecosystem] === choice.key ? 'Last used' : 'Detected')}</span>
+              <span className="wallet-option-status">{tr(managed ? floFiStatus : remembered[choice.ecosystem] === choice.key ? 'Last used' : 'Detected')}</span>
             </button>
-          </li>)}
+          </li>; })}
         </ul> : <p className="wallet-selector-empty" role="status">{tr(incompatible ?? (embedded
           ? 'No compatible wallet is available inside this chat. This host or wallet does not expose a signer here. Nothing was authorized. Opening FloFi is an optional external fallback.'
           : 'No wallet detected in this browser. Install or enable a wallet extension, then refresh.'))}</p>}

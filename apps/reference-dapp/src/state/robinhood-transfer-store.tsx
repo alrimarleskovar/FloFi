@@ -9,6 +9,8 @@ import { TRANSFER_NETWORKS } from '../domain/robinhood-transfer-authoring';
 import { transferBegin, transferHandoff, transferInvalidate, transferObserve, transferRecoverReview, transferReport, transferReview,
   transferSimulate, transferStatus, transferWalletFailure } from '../app/robinhood-transfer-action';
 import type { TransferRecord, TransferWalletDiagnostic } from '../server/robinhood-transfer-service';
+import { bindFloFiSigning } from '../wallet/flofi-wallet-channel';
+import { signingContextOf } from '../wallet/flofi-signing';
 
 const key = 'gryloo:rh-demo-001:transfer';
 const REFUSALS = [4001, 4100, 4200];
@@ -116,6 +118,8 @@ export function RobinhoodTransferProvider({ children }: { children: ReactNode })
       setSigning(true); diagnostic.invoked = true; busyRef.current = false; setBusy(false);
       const { from, to, value, data, chainId, gas, maxFeePerGas, maxPriorityFeePerGas } = begin.transaction;
       let hash: unknown;
+      // BUILD-FLOFI-AUTH-WALLETS-001: FloFi Wallet signs only for the reviewed run it is told about (no effect on any other wallet).
+      bindFloFiSigning(provider, signingContextOf(record.id, 'robinhood-transfer'));
       try { hash = await request('eth_sendTransaction', [{ from, to, value, data, chainId, gas, maxFeePerGas, maxPriorityFeePerGas }]); } finally { setSigning(false); }
       if (typeof hash !== 'string' || !/^0x[0-9a-fA-F]{64}$/.test(hash)) throw new Error('TRANSFER_SUBMISSION_UNKNOWN');
       try { window.localStorage.setItem(key, JSON.stringify({ id: record.id, hash: hash.toLowerCase() })); } catch { /* Reported to the server next. */ }

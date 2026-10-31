@@ -112,7 +112,7 @@ export function ConversationDemo({ t }: { t: LandingCopy }) {
           </div>
           <div className={styles.demoOutro}>
             <p>{t.demoNote}</p>
-            <a href="/app" data-shown={f.done}>{t.demoCta} <span aria-hidden="true">→</span></a>
+            <a href="/login" data-shown={f.done}>{t.demoCta} <span aria-hidden="true">→</span></a>
           </div>
         </div>
       </div>

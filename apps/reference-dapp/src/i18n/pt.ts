@@ -30,8 +30,14 @@ import { portugueseConversation } from './pt-conversation';
 import { portugueseChatE2eFix } from './pt-chat-e2e-fix';
 import { portugueseBridgeLiveFix } from './pt-bridge-live-fix';
 import { portugueseBuildEntry } from './pt-build-entry';
+import { portugueseAccounts } from './pt-accounts';
+import { portugueseWallet } from './pt-wallet';
 /** English source messages are stable presentation keys. Technical identifiers never enter this catalog. */
 export const portuguese: Readonly<Record<string, string>> = {
+  // BUILD-FLOFI-AUTH-WALLETS-001: first, so every existing product translation of a shared word keeps precedence.
+  // FloFi Wallet first: where both catalogues translate the same English text, the product's account wording wins.
+  ...portugueseWallet,
+  ...portugueseAccounts,
   // BUILD-AUTOMATION-001/002: first, so an existing product translation of a shared word keeps precedence.
   ...portugueseFinancialExecution,
   ...portugueseDelegation,
