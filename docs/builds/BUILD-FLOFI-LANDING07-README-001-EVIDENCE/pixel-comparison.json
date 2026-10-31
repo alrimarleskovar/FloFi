@@ -1,0 +1,123 @@
+{
+  "build": "BUILD-FLOFI-LANDING07-README-001",
+  "date": "2026-10-31",
+  "evidenceLevel": "LOCAL (loopback production builds, Chromium headless 1243, deviceScaleFactor 1)",
+  "reference": "`/` built from the package ROUTE_EXAMPLE/page.tsx unchanged (next/font/google Anton, entry links to /app), same branch otherwise",
+  "integrated": "`/` as committed: Landing07Page, locally served Anton (byte-identical next/font/google payloads), entry links to /login",
+  "method": "Full page with prefers-reduced-motion: reduce, and the first viewport with motion allowed after 2.5 s; CSS animations frozen by Playwright (animations: disabled); PT and EN; 1440, 1662, 800 and 390 px",
+  "totalDifferingPixels": 0,
+  "captures": [
+    {
+      "capture": "desktop-1440-en-motion-hero.png",
+      "size": "1440x900",
+      "differingPixels": 0,
+      "referenceSha256": "9141702f0faa00d915b124ece9c1ab4789178831db5d6d9797f89f263d3b3d08",
+      "integratedSha256": "9141702f0faa00d915b124ece9c1ab4789178831db5d6d9797f89f263d3b3d08"
+    },
+    {
+      "capture": "desktop-1440-en-reduced-full.png",
+      "size": "1440x5437",
+      "differingPixels": 0,
+      "referenceSha256": "7e64f169b1830f9b6bfd26ba2c128c74df7dfd17f71e363adf03b1f29666dbc2",
+      "integratedSha256": "7e64f169b1830f9b6bfd26ba2c128c74df7dfd17f71e363adf03b1f29666dbc2"
+    },
+    {
+      "capture": "desktop-1440-pt-motion-hero.png",
+      "size": "1440x900",
+      "differingPixels": 0,
+      "referenceSha256": "a69952693ef97f9a6f74d4c155e4498005a60a8a0998742b1f80d19f5ae1de56",
+      "integratedSha256": "a69952693ef97f9a6f74d4c155e4498005a60a8a0998742b1f80d19f5ae1de56"
+    },
+    {
+      "capture": "desktop-1440-pt-reduced-full.png",
+      "size": "1440x5437",
+      "differingPixels": 0,
+      "referenceSha256": "867abdaff79db192aefbb97de785c39bb3e05b467347997f0fbdc7f36ad09374",
+      "integratedSha256": "867abdaff79db192aefbb97de785c39bb3e05b467347997f0fbdc7f36ad09374"
+    },
+    {
+      "capture": "desktop-1662-en-motion-hero.png",
+      "size": "1662x1000",
+      "differingPixels": 0,
+      "referenceSha256": "4c8bee2f5410e88644fbcdc50befca01f904dead1c4efc63098c864fb54bba4f",
+      "integratedSha256": "4c8bee2f5410e88644fbcdc50befca01f904dead1c4efc63098c864fb54bba4f"
+    },
+    {
+      "capture": "desktop-1662-en-reduced-full.png",
+      "size": "1662x5662",
+      "differingPixels": 0,
+      "referenceSha256": "328aa5e99c8fd8f448753e48a718e6c45f6db933d5bf54c2b86ff04d7137c3c5",
+      "integratedSha256": "328aa5e99c8fd8f448753e48a718e6c45f6db933d5bf54c2b86ff04d7137c3c5"
+    },
+    {
+      "capture": "desktop-1662-pt-motion-hero.png",
+      "size": "1662x1000",
+      "differingPixels": 0,
+      "referenceSha256": "ee5869051439e7dffc6dd37ac4a4e4cba2047d03b7394bea866f54965234ba50",
+      "integratedSha256": "ee5869051439e7dffc6dd37ac4a4e4cba2047d03b7394bea866f54965234ba50"
+    },
+    {
+      "capture": "desktop-1662-pt-reduced-full.png",
+      "size": "1662x5662",
+      "differingPixels": 0,
+      "referenceSha256": "b7d4f1c29f1fb528f28b2e2cbc994750f3214ee2c05abd9e66b9ff1f6c9f100b",
+      "integratedSha256": "b7d4f1c29f1fb528f28b2e2cbc994750f3214ee2c05abd9e66b9ff1f6c9f100b"
+    },
+    {
+      "capture": "mobile-390-en-motion-hero.png",
+      "size": "390x844",
+      "differingPixels": 0,
+      "referenceSha256": "67e9222796f6a960b5d5190695c985a2c6edd6edbe716498f2087d98579a5d97",
+      "integratedSha256": "67e9222796f6a960b5d5190695c985a2c6edd6edbe716498f2087d98579a5d97"
+    },
+    {
+      "capture": "mobile-390-en-reduced-full.png",
+      "size": "390x6967",
+      "differingPixels": 0,
+      "referenceSha256": "2259fb54c4dd0c7b3e9a1ef0d4f71e3bd022147ee1a00bb3c12b291bbff3496e",
+      "integratedSha256": "2259fb54c4dd0c7b3e9a1ef0d4f71e3bd022147ee1a00bb3c12b291bbff3496e"
+    },
+    {
+      "capture": "mobile-390-pt-motion-hero.png",
+      "size": "390x844",
+      "differingPixels": 0,
+      "referenceSha256": "54fc2fafc48f99021e073e02a3da7153f5cc106cf94879a870bfab78724031a1",
+      "integratedSha256": "54fc2fafc48f99021e073e02a3da7153f5cc106cf94879a870bfab78724031a1"
+    },
+    {
+      "capture": "mobile-390-pt-reduced-full.png",
+      "size": "390x6992",
+      "differingPixels": 0,
+      "referenceSha256": "bc5a1af171cb3858534cc967446f0c778789153f78faeb27ee7d804bf652720f",
+      "integratedSha256": "bc5a1af171cb3858534cc967446f0c778789153f78faeb27ee7d804bf652720f"
+    },
+    {
+      "capture": "tablet-800-en-motion-hero.png",
+      "size": "800x1100",
+      "differingPixels": 0,
+      "referenceSha256": "03a42317d386fbebe33669e95bc68f09d6134d7c333520fde0b1f53f541eaa4d",
+      "integratedSha256": "03a42317d386fbebe33669e95bc68f09d6134d7c333520fde0b1f53f541eaa4d"
+    },
+    {
+      "capture": "tablet-800-en-reduced-full.png",
+      "size": "800x6132",
+      "differingPixels": 0,
+      "referenceSha256": "6a1870046422e7afb4407f03e261e60addd12f148ba23672adaca822875db02a",
+      "integratedSha256": "6a1870046422e7afb4407f03e261e60addd12f148ba23672adaca822875db02a"
+    },
+    {
+      "capture": "tablet-800-pt-motion-hero.png",
+      "size": "800x1100",
+      "differingPixels": 0,
+      "referenceSha256": "ebee9f45ba0b0e8347ad0762b7a0bad2bfa42e736cbdb7135e5ab25078e7c0c7",
+      "integratedSha256": "ebee9f45ba0b0e8347ad0762b7a0bad2bfa42e736cbdb7135e5ab25078e7c0c7"
+    },
+    {
+      "capture": "tablet-800-pt-reduced-full.png",
+      "size": "800x6160",
+      "differingPixels": 0,
+      "referenceSha256": "ee5f34469b1bd4e65ba6e9636523f3acf323f939281fdd8e4b9ee5970e44f329",
+      "integratedSha256": "ee5f34469b1bd4e65ba6e9636523f3acf323f939281fdd8e4b9ee5970e44f329"
+    }
+  ]
+}

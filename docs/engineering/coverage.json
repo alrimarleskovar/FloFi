@@ -126,6 +126,10 @@
       "path": "apps/reference-dapp/src/components/account/sign-in.test.tsx",
       "stage": "unit"
     },
+    "app.config.landing07-fonts": {
+      "path": "apps/reference-dapp/src/config/landing07-fonts.test.ts",
+      "stage": "unit"
+    },
     "app.config.product": {
       "path": "apps/reference-dapp/src/config/product.test.ts",
       "stage": "unit"
@@ -196,6 +200,10 @@
     },
     "app.e2e.global-product-polish": {
       "path": "apps/reference-dapp/e2e/global-product-polish.spec.ts",
+      "stage": "browser"
+    },
+    "app.e2e.landing07": {
+      "path": "apps/reference-dapp/e2e/landing07.spec.ts",
       "stage": "browser"
     },
     "app.e2e.wallet-selector": {
@@ -1286,14 +1294,17 @@
         "apps/reference-dapp/src/app/docs/page.tsx",
         "apps/reference-dapp/src/app/fonts.css",
         "apps/reference-dapp/src/app/globals.css",
+        "apps/reference-dapp/src/app/landing07-fonts.css",
         "apps/reference-dapp/src/app/layout.tsx",
         "apps/reference-dapp/src/app/page.tsx",
         "apps/reference-dapp/src/app/privacy/page.tsx",
         "apps/reference-dapp/src/app/privacy/privacy.module.css"
       ],
       "suites": [
+        "app.config.landing07-fonts",
         "app.e2e.canvas-keyboard",
         "app.e2e.global-product-polish",
+        "app.e2e.landing07",
         "app.e2e.wallet-selector",
         "app.i18n.catalog",
         "app.i18n.locale"
@@ -2271,6 +2282,10 @@
         "apps/reference-dapp/src/components/marketing/landing-copy.ts",
         "apps/reference-dapp/src/components/marketing/landing-motion.tsx",
         "apps/reference-dapp/src/components/marketing/landing.module.css",
+        "apps/reference-dapp/src/components/marketing/landing07-copy.ts",
+        "apps/reference-dapp/src/components/marketing/landing07-demo.tsx",
+        "apps/reference-dapp/src/components/marketing/landing07-page.tsx",
+        "apps/reference-dapp/src/components/marketing/landing07.module.css",
         "apps/reference-dapp/src/components/marketing/mascot-animations.ts",
         "apps/reference-dapp/src/components/marketing/mascot-journey.tsx",
         "apps/reference-dapp/src/components/marketing/mascot-motion.module.css",
@@ -2312,6 +2327,7 @@
         "app.e2e.build-entry",
         "app.e2e.canvas-keyboard",
         "app.e2e.global-product-polish",
+        "app.e2e.landing07",
         "app.e2e.wallet-selector",
         "app.i18n.catalog",
         "app.i18n.locale"
@@ -3907,14 +3923,28 @@
         "apps/reference-dapp/public/fonts/ibm-plex-mono-c6f09ee0e0a24b7c.woff2",
         "apps/reference-dapp/public/fonts/ibm-plex-mono-d524dc8ff6dbf7ed.woff2",
         "apps/reference-dapp/public/fonts/ibm-plex-mono-f1050dc5317b4343.woff2",
+        "apps/reference-dapp/public/fonts/landing07/Anton.OFL.txt",
+        "apps/reference-dapp/public/fonts/landing07/anton-23aab0b2692a0c89.woff2",
+        "apps/reference-dapp/public/fonts/landing07/anton-889f979804fc6c2d.woff2",
+        "apps/reference-dapp/public/fonts/landing07/anton-ae1a8ac1c2899a66.woff2",
+        "apps/reference-dapp/public/fonts/landing07/manifest.json",
         "apps/reference-dapp/public/fonts/manifest.json",
         "apps/reference-dapp/public/fonts/outfit-92684e4acde79ef0.woff2",
         "apps/reference-dapp/public/fonts/outfit-9e38b3f1575daba3.woff2",
-        "apps/reference-dapp/public/gryloo-logo.png"
+        "apps/reference-dapp/public/gryloo-logo.png",
+        "apps/reference-dapp/public/landing07/bubble-reference-v2.png",
+        "apps/reference-dapp/public/landing07/clock.webp",
+        "apps/reference-dapp/public/landing07/mascot-reference-v2.png",
+        "apps/reference-dapp/public/landing07/ribbon-reference-v2.png",
+        "apps/reference-dapp/public/landing07/strategy-sculpture.png",
+        "apps/reference-dapp/public/landing07/swap-sculpture.png",
+        "apps/reference-dapp/public/landing07/transfer-sculpture.png"
       ],
       "suites": [
+        "app.config.landing07-fonts",
         "app.e2e.canvas-keyboard",
         "app.e2e.global-product-polish",
+        "app.e2e.landing07",
         "app.e2e.wallet-selector",
         "app.i18n.catalog",
         "app.i18n.locale"

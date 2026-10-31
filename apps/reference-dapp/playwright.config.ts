@@ -234,8 +234,14 @@ if (copilot !== undefined && copilot !== 'off' && copilot !== 'replay') throw ne
 //  - the other six: every one of their tests already failed on `main` cbf340e before this build (2026-10-24 baseline run), for
 //    reasons unrelated to it (typography, picker contents, layout and focus).
 // Rewriting them is a separate decision (BUILD-FLOFI-MAINNET-PRODUCT-001 report, §8).
+// BUILD-FLOFI-LANDING07-README-001: retired with the landing they describe. `/` now renders Caio's Landing 07, so the previous
+// landing's sections are no longer routed: its community links, MCP card, conversation demo and mascot journey (ux-ui-002-landing),
+// section layout and Earth closing (landing-structure, earth-footer), mascot motion (brand-motion-001), connected-infrastructure
+// diagram (brand-visual-refinement) and three-phase story (workflow-story). Landing 07 is covered by landing07.spec.ts; the old
+// landing's entry, Docs and sign-in assertions moved there and into brand-ux-001, beta-ui, native-docs and auth-wallets.
+const RETIRED_LANDING_SPECS = ['ux-ui-002-landing', 'landing-structure', 'earth-footer', 'brand-motion-001', 'brand-visual-refinement', 'workflow-story'];
 const RETIRED_SPECS = ['wallet-environment', 'brand-icon-colors', 'bridge-network-picker', 'crypto-action-picker', 'global-product-polish',
-  'header-controls', 'product-typography-logo'].map(name => `**/${name}.spec.ts`);
+  'header-controls', 'product-typography-logo', ...RETIRED_LANDING_SPECS].map(name => `**/${name}.spec.ts`);
 
 export default defineConfig({
   testDir: './e2e',

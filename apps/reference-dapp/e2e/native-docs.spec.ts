@@ -77,17 +77,13 @@ test('desktop TOC, previous/next and skip link navigate real content', async ({ 
   await expect(page.getByRole('navigation', { name: 'Breadcrumbs' })).toContainText('Wallet Authorization');
 });
 
-test('landing uses native Docs and developer pages while launch remains /app', async ({ page }) => {
-  await page.addInitScript(() => sessionStorage.setItem('flofi-alive-intro-v1', 'seen'));
+// BUILD-FLOFI-LANDING07-README-001: Landing 07 links the native Docs from its header and footer; it has no developer-API link of its own.
+test('landing uses native Docs while product entry opens sign-in', async ({ page }) => {
   await page.goto('/');
   const docs = page.getByRole('link', { name: 'Docs', exact: true }); expect(await docs.count()).toBe(2);
   for (const link of await docs.all()) await expect(link).toHaveAttribute('href', '/docs');
-  const buildLinks = page.getByRole('link', { name: 'Build with FloFi', exact: true });
-  await expect(buildLinks).toHaveCount(2);
-  for (const link of await buildLinks.all()) await expect(link).toHaveAttribute('href', '/docs/developer-api');
-  await expect(page.getByRole('link', { name: /Explore Docs/ })).toHaveAttribute('href', '/docs');
-  await expect(page.getByRole('link', { name: /Developer documentation/ })).toHaveAttribute('href', '/docs');
-  for (const link of await page.getByRole('link', { name: /Launch (Beta )?FloFi/ }).all()) await expect(link).toHaveAttribute('href', '/login');
+  await expect(page.locator('a[href="/app"]')).toHaveCount(0);
+  for (const link of await page.getByRole('link', { name: /Começar com FloFi|Abrir o FloFi/ }).all()) await expect(link).toHaveAttribute('href', '/login');
   await docs.first().click(); await expect(page).toHaveURL(/\/docs$/); await expect(page.getByRole('heading', { name: 'Documentation', exact: true })).toBeVisible();
 });
 

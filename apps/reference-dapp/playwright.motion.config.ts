@@ -7,7 +7,7 @@ const origin = process.env.FLOFI_MOTION_TEST_ORIGIN ?? 'http://127.0.0.1:3001';
 if (!/^http:\/\/127\.0\.0\.1:\d{4,5}$/.test(origin)) throw new Error('MOTION_TEST_REQUIRES_LOOPBACK');
 const cache = process.env.BUILD002_BROWSER_CACHE;
 export default defineConfig({
-  testDir: './e2e', testMatch: ['brand-motion-001.spec.ts', 'brand-visual-refinement.spec.ts', 'workflow-story.spec.ts', 'landing-structure.spec.ts', 'earth-footer.spec.ts', 'ux-ui-002-landing.spec.ts'],
+  testDir: './e2e', testMatch: ['landing07.spec.ts'], // BUILD-FLOFI-LANDING07-README-001: the landing at `/` (see RETIRED_LANDING_SPECS in playwright.config.ts).
   workers: 1, retries: 0, timeout: 30_000, reporter: 'list',
   outputDir: 'test-results/motion',
   use: {

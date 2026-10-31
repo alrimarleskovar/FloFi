@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 import { test, expect, assertNoFinancialCanvasAction, sendChatCommand } from './fixtures';
-import { assertConnectedFlow } from './connected-flow-assertions';
-import { openBuilder, reloadBuilder } from './build-entry-navigation';
+import { openBuilder } from './build-entry-navigation';
 
 const widths = [320, 375, 390, 430, 768, 1024, 1440];
 async function noOverflow(page: import('@playwright/test').Page) {
@@ -9,65 +8,40 @@ async function noOverflow(page: import('@playwright/test').Page) {
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 }
 
-async function connectedInfrastructure(page: import('@playwright/test').Page) {
-  const diagram = page.locator('[data-flow-diagram="light"]');
-  await diagram.scrollIntoViewIfNeeded();
-  await assertConnectedFlow(diagram);
-}
-
 for (const width of widths) {
+  // BUILD-FLOFI-LANDING07-README-001: `/` is Caio's Landing 07 (Portuguese first). Its product-entry links open sign-in (PR #143), from
+  // where the builder stays reachable without an account. The previous landing's sections, story and diagram are no longer routed.
   test(`landing, keyboard navigation and product entry at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Many ways in.');
-    await expect(page.locator('main')).toContainText('Strategy Manifest');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('FLOFI');
     await expect(page.locator('.app-shell')).toHaveCount(0);
-    await expect(page.locator('[data-story-phase="Review"]')).toContainText('Your explicit approval');
-    await expect(page.locator('[data-story-phase="Execute"]')).toContainText('Your wallet signature');
     await expect(page.getByRole('button', { name: 'Authorize workflow', exact: true })).toHaveCount(0);
-    expect(await page.locator('main > section').evaluateAll(items => items.map(item => item.id))).toEqual(['workflow', 'networks', 'demo', 'assistants', 'developers', 'about']);
-    await expect(page.locator('#product, #scenarios, #review')).toHaveCount(0);
-    for (const channel of ['Chat', 'Canvas', 'GPT', 'Claude', 'WhatsApp', 'Telegram']) await expect(page.locator('#workflow')).toContainText(channel);
-    await expect(page.locator('#evidence')).toHaveCount(0);
+    expect(await page.locator('main section[id]').evaluateAll(items => items.map(item => item.id))).toEqual(['inicio', 'como-funciona', 'possibilidades', 'faq']);
     await expect(page.locator('main')).not.toContainText(/devnet|testnet|sepolia|mock|sandbox|synthetic|simulated.only|test.funds/i);
     await expect(page.locator('a[href*="cluster=devnet"]')).toHaveCount(0);
-    const networks = page.getByRole('region', { name: 'Supported networks', exact: true });
-    for (const network of ['Ethereum', 'Base', 'Arbitrum', 'Solana', 'Robinhood Chain']) await expect(networks).toContainText(network);
-    await expect(networks).toContainText('Tempo');
-    await expect(networks).toContainText('Upcoming');
-    await expect(networks).not.toContainText(/live|launched|rolling out/i);
-    await expect(networks.getByRole('listitem')).toHaveCount(6);
     await page.locator('main img').evaluateAll(images => images.forEach(img => { (img as HTMLImageElement).loading = 'eager'; }));
     await expect.poll(() => page.locator('main img').evaluateAll(images => images
       .filter(img => !(img as HTMLImageElement).complete || (img as HTMLImageElement).naturalWidth === 0)
       .map(img => img.getAttribute('src')))).toEqual([]);
     await expect(page.getByRole('link', { name: 'Docs', exact: true }).first()).toHaveAttribute('href', '/docs');
     await page.keyboard.press('Tab');
-    await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+    await expect(page.getByRole('link', { name: 'Pular para o conteúdo' })).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page.locator('#main')).toBeFocused();
-    await connectedInfrastructure(page);
-    await expect(page.locator('[data-flow-diagram="light"]')).toContainText('Onchain protocols');
     await noOverflow(page);
-    if (process.env.FLOFI_BRAND_EVIDENCE && [320,390,768,1024,1440].includes(width)) await page.locator('[data-flow-diagram="light"]').screenshot({ path: `e2e/visual-evidence/build-brand-ux-001/after-infrastructure-${width}.png` });
-    if (process.env.FLOFI_BRAND_EVIDENCE && [390,1440].includes(width)) await page.screenshot({ path: `e2e/visual-evidence/build-brand-ux-001/after-landing-${width}.png`, fullPage: true });
-    if (process.env.FLOFI_BRAND_EVIDENCE && width === 1440) {
-      await page.locator('#workflow').screenshot({ path: 'e2e/visual-evidence/build-brand-ux-001/after-landing-hero-1440.png' });
-      await networks.screenshot({ path: 'e2e/visual-evidence/build-brand-ux-001/after-networks-1440.png' });
-    }
+    await page.getByRole('button', { name: 'EN', exact: true }).click();
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'From conversation to strategy.' })).toBeVisible();
+    await expect(page.locator('main')).not.toContainText(/devnet|testnet|sepolia|mock|sandbox|synthetic|test.funds/i);
     await page.getByRole('button', { name: 'PT', exact: true }).click();
     await expect(page.locator('html')).toHaveAttribute('lang', 'pt-BR');
-    await reloadBuilder(page);
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Várias entradas.');
-    await expect(page.locator('main')).not.toContainText(/devnet|testnet|sepolia|mock|sandbox|synthetic|fundos de teste/i);
-    await expect(page.getByRole('region', { name: 'Redes compatíveis', exact: true })).toContainText('Em breve');
-    await connectedInfrastructure(page);
-    await expect(page.locator('[data-flow-diagram="light"]')).toContainText('Protocolos onchain');
-    await page.getByRole('button', { name: 'EN', exact: true }).click();
-    await expect(page.getByRole('link', { name: 'Launch Beta FloFi', exact: true })).toBeVisible();
-    await page.getByRole('link', { name: 'Launch Beta FloFi', exact: true }).click();
+    const entry = page.locator('header a[href="/login"]');
+    await expect(entry).toBeVisible();
+    await entry.click();
     // BUILD-FLOFI-AUTH-WALLETS-001: the landing opens sign-in first; the builder stays reachable without an account.
     await expect(page).toHaveURL('/login');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -150,15 +124,11 @@ for (const width of [320, 375, 390, 430]) {
   });
 }
 
-test('reduced motion exposes all three workflow phases without pinning', async ({ page }) => {
+test('reduced motion shows every Landing 07 block at once, without pinning', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#workflow [data-story-phase]')).toHaveCount(3);
-  for (const card of await page.locator('#workflow [data-story-phase]').all()) {
-    await expect(card).toBeVisible();
-    expect(await card.evaluate(element => getComputedStyle(element).position)).not.toBe('sticky');
-  }
-  const animated = await page.locator('main').evaluate(element => [...element.querySelectorAll('*')].filter(item => getComputedStyle(item).animationName !== 'none').length);
-  expect(animated).toBe(0);
+  for (const block of await page.locator('[data-landing07-reveal]').all()) expect(await block.evaluate(element => getComputedStyle(element).opacity)).toBe('1');
+  expect(await page.locator('main').evaluate(element => [...element.querySelectorAll('*')].filter(item => getComputedStyle(item).position === 'sticky').length)).toBe(0);
+  await expect(page.locator('[data-demo-stage]')).toHaveAttribute('data-demo-stage', '6');
 });
 
 test('desktop workflow showcase uses the actual builder', async ({ page }) => {
@@ -169,21 +139,17 @@ test('desktop workflow showcase uses the actual builder', async ({ page }) => {
   if (process.env.FLOFI_BRAND_EVIDENCE) await page.screenshot({ path: 'e2e/visual-evidence/build-brand-ux-001/after-build-1440.png', fullPage: true });
 });
 
-test('desktop three-step story is readable together and scrolls naturally', async ({ page }) => {
+test('Landing 07 scrolls naturally through its sections with motion allowed', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
-  const story = page.locator('#workflow');
-  const cards = story.locator('[data-story-phase]');
-  expect(await cards.evaluateAll(items => items.map(item => item.getAttribute('data-story-phase')))).toEqual(['Build', 'Review', 'Execute']);
-  for (const card of await cards.all()) await expect(card).toBeVisible();
-  expect((await story.boundingBox())!.height).toBeLessThan(1100);
-  await page.locator('#networks').scrollIntoViewIfNeeded();
-  await expect(page.locator('#networks')).toBeInViewport();
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
-    await connectedInfrastructure(page);
+    for (const id of ['como-funciona', 'possibilidades', 'faq']) {
+      await page.locator(`#${id}`).scrollIntoViewIfNeeded();
+      await expect(page.locator(`#${id}`)).toBeInViewport();
+    }
+    await noOverflow(page);
   }
-  await noOverflow(page);
 });
 
 test('all migrated product routes remain accessible and sensitive routes retain their headers', async ({ page }) => {
@@ -195,7 +161,7 @@ test('all migrated product routes remain accessible and sensitive routes retain 
     expect(response?.status()).toBe(200);
     await expect(page.locator('.app-shell')).toBeVisible();
     await expect(page.getByRole('navigation', { name: 'Workflow stages' })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 1, name: /Many ways in/ })).toHaveCount(0);
+    await expect(page.getByRole('heading', { level: 1, name: 'FLOFI', exact: true })).toHaveCount(0);
   }
   for (const path of ['/approve', '/connections']) {
     const response = (await page.goto(path))!;

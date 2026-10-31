@@ -253,4 +253,3 @@ export function takeFloFiSigning(target: object): SigningContext | null {
   contexts.delete(target);
   return entry && Date.now() - entry.at <= FLOFI_SIGNING_CONTEXT_TTL_MS ? entry.context : null;
 }
-

@@ -79,7 +79,7 @@ export const portugueseWallet: Readonly<Record<string, string>> = {
   'It proves you control this wallet. It authorizes no transaction and moves no funds.': 'Ela prova que você controla esta carteira. Não autoriza nenhuma transação e não move fundos.',
   'Website': 'Site', 'Chain ID': 'ID da chain', 'Expires': 'Expira', 'Full message': 'Mensagem completa', 'Signed in to FloFi with {0}.': 'Login no FloFi feito com {0}.',
   'Transaction': 'Transação', 'Sign a transaction on {0}': 'Assinar uma transação na {0}', 'Sign a Solana transaction': 'Assinar uma transação Solana',
- 
+
   'Checking this request against your Review in FloFi…': 'Conferindo este pedido com a sua Revisão no FloFi…',
   // Summary lines built by FloFi's server (server/managed-signing.ts)
   'Network fee (estimate)': 'Taxa de rede (estimativa)', 'Approve': 'Aprovar', 'For': 'Para', 'Max network fee': 'Taxa de rede máxima',
